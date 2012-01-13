@@ -1,0 +1,2 @@
+Phase 1 : we should be able to send a message to server and it responds with the same message.
+          This phase should test the threadpool, socket layer, and socket queue.
