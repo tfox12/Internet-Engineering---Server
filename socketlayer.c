@@ -1,5 +1,9 @@
 #include "socketlayer.h"
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include <errno.h>
 
 static const int
@@ -9,7 +13,7 @@ static const int
 DEFAULT_MESSAGE_SIZE = 50;
 
 int
-create_listening_socket()
+create_listening_socket(void)
 {
     
     int sockfd;
@@ -24,7 +28,7 @@ create_listening_socket()
     memset(&addr,0,sizeof(addr));
 
     addr.sin_family         = AF_INET;
-    addr.sin_port           = htons(80);
+    addr.sin_port           = htons(6666);
     addr.sin_addr.s_addr    = INADDR_ANY;
     
     if(
@@ -55,10 +59,10 @@ read_from_socket(int sockfd)
     char * message_itor = message;
 
     while(
-    recv(sockfd,message_itor,DEFAULT_MESSAGE_SIZE) == DEFAULT_MESSAGE_SIZE)
+    recv(sockfd,(void *)message_itor,DEFAULT_MESSAGE_SIZE, 0) == DEFAULT_MESSAGE_SIZE)
     {
         message = realloc(message,message_size += DEFAULT_MESSAGE_SIZE);
-        message_itor = message = message_size - DEFAULT_MESSAGE_SIZE;
+        message_itor = message + message_size - DEFAULT_MESSAGE_SIZE;
     }
 
     return message;
@@ -74,7 +78,7 @@ write_to_socket(int sockfd, char * message, int message_length)
     {
         // lets try to send using the path MTU
         while(
-        send(sockfd, message_itor, transmition_unit, NULL) < 0)
+        send(sockfd, (void *)message_itor, transmition_unit, 0) < 0)
         {
             if(errno == EMSGSIZE)   transmition_unit /= 2;
             else

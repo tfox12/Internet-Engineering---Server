@@ -1,11 +1,11 @@
 #include <unistd.h>
-#include <sys/socket>
+#include <sys/socket.h>
 #include "socketlayer.h"
 #include "threadpool.h"
 #include "socketqueue.h"
 
 static int
-listening_socket = NULL;
+listening_socket = 0;
 
 void
 initalize_system(void)

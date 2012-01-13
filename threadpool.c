@@ -1,18 +1,16 @@
 #include "threadpool.h"
 #include "socketqueue.h"
-#include "httpparser.h"
-#include "socketlayer"
+#include "socketlayer.h"
 
 // BEGIN : page specific data
 
-static const int
-NUM_THREADS = 10;
+#define NUM_THREADS 10
 
 static pthread_t
-pool        [NUM_THREADS];
+pool[NUM_THREADS];
 
 static pthread_mutex_t
-lock        = PTHREAD_MUTEX_INITALIZER;
+lock        = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_cond_t
 condition   = PTHREAD_COND_INITIALIZER;
@@ -35,13 +33,9 @@ thread_main(void * thread_arg)
         // as of this point we have acquired a socket file descriptor        
 
         char * message = read_from_socket(sockfd);
-        http_request_data * data = parse_request(message);
-        
-        // we have the message now just need to figure out what the fuck to do with it
-        // TODO: figure out what the fuck to do with it
-        // TODO: send a response to the client about what the fuck we did with it
+     
+        write_to_socket(sockfd,message,sizeof(message));
 
-        free(data);
         free(message);
     }
 
@@ -52,11 +46,10 @@ thread_main(void * thread_arg)
 void
 threadpool_init(void)
 {
-    for(int idx = 0, pthread_t * pool_itor = pool;
-        idx < NUM_THREADS;
-        ++idx, ++pool_itor)
+    int idx;
+    for(idx = 0; idx < NUM_THREADS; ++idx)
     {
-        pthread_create(pool_itor, NULL, &thread_main, NULL);
+        pthread_create(&pool[idx], NULL, &thread_main, NULL);
     }
 }
 
