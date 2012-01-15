@@ -1,2 +1,6 @@
 Phase 1 : we should be able to send a message to server and it responds with the same message.
           This phase should test the threadpool, socket layer, and socket queue.
+Phase 2 : Now that we have the threadpool working and the socket layer can indeed read and write,
+          we should be able to process a GET request in accordance with RFC 2616 (HTTP v1.1).
+          The conclusion of this phase is after we are able to have the server return a HTML document that
+          corisponds to the GET request.
