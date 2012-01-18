@@ -9,8 +9,21 @@ config_data = 0;
 static configuration
 config_pointers;
 
+static int
+set_root_dir(void)
+{
+  char * root_dir_key = "root_dir='";
+  
+  char * start;
+  if(start = strstr(config_data,root_dir_key))
+  {
+    
+  }
+  else return -1;
+}
+
 void
-load_config()
+load_config(void)
 {
     int configfd;
     if(
@@ -38,14 +51,11 @@ load_config()
 
     close(configfd);
 
-    /* contents of the config file need to be figured out */
-
-    /* what we will do is point the configuration structure
-       to values in the data (much like the http structs) */
+    
 }
 
 void
-unload_config()
+unload_config(void)
 {
     free(config_data);
 }

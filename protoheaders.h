@@ -3,12 +3,19 @@
 
 typedef struct
 {
+    char      * val;
+    char_node * next;
+} char_node;
+
+typedef struct
+{
 // request line
     char *  method,
          *  uri,
          *  version;
 // headers
-    char ** headers;
+    char_node * headers_keys;
+    char_node * headers_values;
 // payload
     char *  body;
 } http_request_data;
@@ -20,9 +27,16 @@ typedef struct
          *  code,
          *  phrase;
 // headers
-    char ** headers;
+    char_node * headers_keys;
+    char_node * headers_values;
 // payload
     char *  body;
 } http_response_data;
+
+void
+free_request_data(http_request_data * data);
+
+void
+free_response_data(http_response_data * data);
 
 #endif

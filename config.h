@@ -4,14 +4,14 @@
 /* needs to be figured out */
 typedef struct 
 {
-    char *  
+    char * root_dir;
 } configuration;
 
 void
-load_config();
+load_config(void);
 
 void
-unload_config();
+unload_config(void);
 
 /* an api for getting data from config...
    whatever that data may be */
