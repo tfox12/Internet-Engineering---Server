@@ -8,51 +8,33 @@
 #include <netdb.h>
 
 
-
+/*
+this function shall be a reminder of the benefit
+of a good tutorial and time spent reading it
+*/
 int
-connect_ip(const char ip_address[], const char port[])
+connect_host(const char address[], const char port[])
 {
-	int client_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	struct sockaddr_in myaddr;
-	myaddr.sin_addr.s_addr = inet_addr(ip_address); 
-	myaddr.sin_port = htons(port); 
-	myaddr.sin_family = AF_INET; 
-	int ret = connect(client_socket, (struct sockaddr *)&myaddr, sizeof(myaddr)); 
-	if (ret < 0) { 
-			perror("Unable to create socket");
-	}
-	
-	return client_socket;
-
-}
-
-
-int
-connect_dns(const char web_address[], const char port[])
-{
-	int client_socket;
-	struct addrinfo hints, *ai, *ai0;
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
+	int socket_fd ;
+	int status;
+	struct addrinfo hints, *serverInfo;
+	memset(&hints, 0 , sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	int i;
-
-	i = getaddrinfo(web_address, port, &hints, &ai0);
-	for (ai = ai0; ai != NULL; ai = ai->ai_next) {
-		client_socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
-		if (client_socket == -1) {
-			perror("Unable to create socket");
-			continue;
-		}
-		if (connect(client_socket, ai->ai_addr, ai->ai_addrlen) == -1) {
-			perror("Unable to connect");
-			close(client_socket);
-			continue;
-		}
-		return client_socket;
-	}
-	if (ai == NULL) {
-	// Connection failed, handle the failure...
-	}
+	
+	status = getaddrinfo(address, port, &hints, &serverInfo);
+	socket_fd = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol);
+	if(socket_fd  == -1)
+		perror("looks like your sockets arent building, eh?");
+	
+	int connected_client;
+	connected_client = connect(socket_fd, serverInfo->ai_addr, serverInfo->ai_addrlen);
+	
+	if(connected_client == -1)
+		perror("error in connection");
+	
+	return connected_client;
+	
 	
 }
+
