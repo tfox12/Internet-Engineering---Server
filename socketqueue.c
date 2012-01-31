@@ -1,5 +1,6 @@
 #include "socketqueue.h"
 #include "threadpool.h"
+#include <stdlib.h>
 
 typedef struct
 {
@@ -22,6 +23,8 @@ enqueue_socket(int sockfd)
 
     if(end_of_line) 
         end_of_line->next = temp;
+    else
+        next_in_line = temp;
 
     end_of_line = temp;
 
@@ -35,7 +38,7 @@ dequeue_socket(void)
     {
         int sockfd = next_in_line->socket;
         void * temp = (void*)next_in_line;        
-        next_in_line = next_in_line->next;
+        next_in_line = (queue_node *)next_in_line->next;
 
         free(temp);
 
