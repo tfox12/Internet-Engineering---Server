@@ -1,16 +1,36 @@
 #include "socketlayer.h"
-#include <unistd.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+
+/*unix headers*/
+#ifdef __unix__
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <errno.h>
+
+/*windows headers*/
+#elif defined _WIN32
+#include <Windows.h>
+#include <WinSock.h>
+
+#endif
 
 static const int
 BACKLOG = 100;
 
 static const int
 DEFAULT_MESSAGE_SIZE = 50;
+
+static void
+close_socket(int sockfd)
+{
+#ifdef __unix__
+    close(sockfd);
+#elif defined _WIN32
+    closesocket(sockfd);
+#endif
+}
 
 int
 create_listening_socket(void)
@@ -35,7 +55,7 @@ create_listening_socket(void)
     bind(sockfd,(struct sockaddr *) &addr, sizeof(addr)) < 0)
     {
         perror("socketlayer | create_listening_socket | bind");
-        close(sockfd);
+        close_socket(sockfd);
         exit(-1);
     }
 
@@ -43,7 +63,7 @@ create_listening_socket(void)
     listen(sockfd,BACKLOG) < 0)
     {
         perror("socketlayer | create_listening_socket | bind");
-        close(sockfd);
+        close_socket(sockfd);
         exit(-1);
     }
 
@@ -59,9 +79,9 @@ read_from_socket(int sockfd)
     char * message_itor = message;
 
     while(
-    recv(sockfd,(void *)message_itor,DEFAULT_MESSAGE_SIZE, 0) == DEFAULT_MESSAGE_SIZE)
+    recv(sockfd,message_itor,DEFAULT_MESSAGE_SIZE, 0) == DEFAULT_MESSAGE_SIZE)
     {
-        message = realloc(message,message_size += DEFAULT_MESSAGE_SIZE);
+        message = (char *) realloc(message,message_size += DEFAULT_MESSAGE_SIZE);
         message_itor = message + message_size - DEFAULT_MESSAGE_SIZE;
     }
 
@@ -78,12 +98,13 @@ write_to_socket(int sockfd, char * message, int message_length)
     {
         // lets try to send using the path MTU
         while(
-        send(sockfd, (void *)message_itor, transmition_unit, 0) < 0)
+        send(sockfd,message_itor, transmition_unit, 0) < 0)
         {
             if(errno == EMSGSIZE)   transmition_unit /= 2;
             else
             {
                 perror("socketlayer | write_to_socket | send");
+			    close_socket(sockfd);
                 exit(-1);
             }
         }
