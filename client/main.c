@@ -23,7 +23,7 @@ main(void)
 
 
     /*  Output echoed string  */
-     printf("%d",  connect_beta("www.retran.com", "80"));
+     printf("%d",  connect_host("www.retran.com", "80"));
     //printf("Echo response: %s\n", buffer);
 
 }
