@@ -15,10 +15,10 @@ of a good tutorial and time spent reading it
 int
 connect_host(const char address[], const char port[])
 {
-	int socket_fd ;
+	int socket_fd;
 	int status;
 	struct addrinfo hints, *serverInfo;
-	memset(&hints, 0 , sizeof(hints));
+	memset(&hints,0,sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	
