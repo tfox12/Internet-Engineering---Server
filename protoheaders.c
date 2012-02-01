@@ -1,4 +1,5 @@
 #include "protoheaders.h"
+#include <stdlib.h>
 
 void
 free_request_data(http_request_data * data)

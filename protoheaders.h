@@ -1,10 +1,10 @@
 #ifndef _SERVER_PROTOHEADERS_
 #define _SERVER_PROTOHEADERS_
 
-typedef struct
+typedef struct _char_node
 {
     char      * val;
-    char_node * next;
+    struct _char_node * next;
 } char_node;
 
 typedef struct
