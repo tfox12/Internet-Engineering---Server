@@ -41,18 +41,15 @@ main(void)
      char response[4096];
 
      while(getline(&targetHost,&minBytes, stdin))
-     {
-         puts(targetHost);
-	 puts("yo");
-	 char test[] = "www.google.com";
-	 remove_newline(targetHost);
-         connectionSocket =  connect_host(targetHost, "80");
-         bytes_sent = send(connectionSocket, msg, len, 0);
-         ret = recv(connectionSocket, response, sizeof(response), 0);
-         printf("Echo response: %s\n", response);
-         close(connectionSocket);
-	 memset(response, 0, sizeof(response));
-	 memset(targetHost, 0, sizeof(targetHost));
+     { 
+	remove_newline(targetHost);
+        connectionSocket =  connect_host(targetHost, "80");
+        bytes_sent = send(connectionSocket, msg, len, 0);
+        ret = recv(connectionSocket, response, sizeof(response), 0);
+        printf("Echo response: %s\n", response);
+        close(connectionSocket);
+	memset(response, 0, sizeof(response));
+	memset(targetHost, 0, sizeof(targetHost));
      }
 
 }

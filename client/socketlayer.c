@@ -15,7 +15,6 @@ of a good tutorial and time spent reading it
 int
 connect_host(const char address[], const char port[])
 {
-	puts(address);
 	int socket_fd;
 	int status;
 	struct addrinfo hints, *serverInfo;
