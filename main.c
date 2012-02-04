@@ -1,8 +1,16 @@
-#include <unistd.h>
-#include <sys/socket.h>
 #include "socketlayer.h"
 #include "threadpool.h"
 #include "socketqueue.h"
+
+#ifdef __unix__
+
+#include <sys/socket.h>
+
+#elif defined _WIN32
+
+#include <WinSock.h>
+
+#endif
 
 static int
 listening_socket = 0;

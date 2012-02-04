@@ -1,7 +1,7 @@
 #include "config.h"
 #include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
 
 static void *
 config_data = 0;
@@ -12,22 +12,28 @@ config_pointers;
 static int
 set_root_dir(void)
 {
-  char * root_dir_key = "root_dir='";
   
-  char * start;
-  if(start = strstr(config_data,root_dir_key))
-  {
-    
-  }
-  else return -1;
 }
+
+static int
+set_log_file(void)
+{
+    
+}
+
+configuration *
+get_config(void)
+{
+    return &config_pointers;
+}
+
 
 void
 load_config(void)
 {
-    int configfd;
+    FILE * configfd;
     if(
-    configfd = open("server.config",O_RONLY) < 0)
+    (configfd = fopen("server.config","r")) < 0)
     {
         perror("config | load_config | open");
         exit(-1);
@@ -35,23 +41,23 @@ load_config(void)
 
     int size_of_file; 
     if(
-    size_of_file = lseek(configfd, 0, SEEK_END) < 0)
+    (size_of_file = fseek(configfd, 0, SEEK_END)) < 0)
     {
         perror("config | load_config | lseek");
-        close(configfd);
+        fclose(configfd);
         exit(-1);
     }    
 
-    lseek(configfd, 0, SEEK_SET); /* reset the file pointer to beginning */
+    fseek(configfd, 0, SEEK_SET); /* reset the file pointer to beginning */
 
     config_data = calloc(size_of_file + 1, sizeof(char));
 
-    read(configfd, config_data, size_of_file);
-    config_data[size_of_file] = 0; /* non-assigned values will point to here */
+    fread(config_data, sizeof(char), size_of_file,configfd);
+    ((char *)config_data)[size_of_file] = 0; /* non-assigned values will point to here */
 
-    close(configfd);
+    set_root_dir();
 
-    
+    fclose(configfd);
 }
 
 void

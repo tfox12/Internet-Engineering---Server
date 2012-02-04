@@ -1,5 +1,6 @@
 #include "httpparser.h"
 #include <string.h>
+#include <stdlib.h>
 
 static char * 
 parse_request_line(http_request_data * data, 
@@ -7,16 +8,16 @@ parse_request_line(http_request_data * data,
 {
   /* Request-Line   = Method SP Request-URI SP HTTP-Version CRLF */
   
-  data->method     = *message_itor;
-  message_itor    = strchar(message_itor,' ');
+  data->method    = message_itor;
+  message_itor    = strchr(message_itor,' ');
   *message_itor   = 0;
   
   data->uri        = message_itor + 1;
-  message_itor    = strchar(message_itor,' ');
+  message_itor    = strchr(message_itor,' ');
   *message_itor   = 0;
   
   data->version    = message_itor + 1;
-  message_itor    = strchar(message_itor,'\r');
+  message_itor    = strchr(message_itor,'\r');
   *message_itor   = 0;
   
   return message_itor + 2;
@@ -34,14 +35,14 @@ parse_headers(http_request_data * data,
   
     if(!data->headers_keys)
     {
-      headers_keys   = (char_node *) malloc(sizeof(char_node));
-      memset(headers_keys,0,sizeof(char_node));
+      data->headers_keys   = (char_node *) malloc(sizeof(char_node));
+      memset(data->headers_keys,0,sizeof(char_node));
 
-      headers_values = (char_node *) malloc(sizeof(char_node));
-      memset(headers_values,0,sizeof(char_node));
+      data->headers_values = (char_node *) malloc(sizeof(char_node));
+      memset(data->headers_values,0,sizeof(char_node));
 
-      current_key    = headers_keys;
-      current_value  = headers_value;
+      current_key    = data->headers_keys;
+      current_value  = data->headers_values;
     }
     else
     {
@@ -56,7 +57,7 @@ parse_headers(http_request_data * data,
     }
   
     current_key->val   = message_itor;
-    message_itor       = strchar(message_itor,':');
+    message_itor       = strchr(message_itor,':');
     *message_itor      = 0;
     
     current_value->val = message_itor + 1;
