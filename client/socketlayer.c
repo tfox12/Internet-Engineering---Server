@@ -25,7 +25,7 @@ connect_host(const char address[], const char port[])
 	status = getaddrinfo(address, port, &hints, &serverInfo);
 	socket_fd = socket(serverInfo->ai_family, serverInfo->ai_socktype, serverInfo->ai_protocol);
 	if(socket_fd  == -1)
-		perror("looks like your sockets arent building, eh?");
+		perror("Yo sockets ain't working right, son.");
 	
 	int connected_client;
 	connected_client = connect(socket_fd, serverInfo->ai_addr, serverInfo->ai_addrlen);
@@ -33,7 +33,7 @@ connect_host(const char address[], const char port[])
 	if(connected_client == -1)
 		perror("error in connection");
 	
-	return connected_client;
+	return socket_fd;
 	
 	
 }
