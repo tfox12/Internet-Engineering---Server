@@ -1,6 +1,7 @@
 #include "socketlayer.h"
 #include "threadpool.h"
 #include "socketqueue.h"
+#include <stdlib.h>
 
 #ifdef __unix__
 
