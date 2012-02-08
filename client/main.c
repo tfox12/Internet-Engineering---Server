@@ -46,6 +46,7 @@ main(int argCount, char **arguments)
         close_socket(connectionSocket);
 		memset(response, 0, sizeof(response));
 		memset(targetHost, 0, sizeof(targetHost));
+		puts("What host shall we connect to?\n");
      }
 
 }
