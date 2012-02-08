@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #define MAX_LINE           (1000)
 static int 
@@ -22,10 +23,10 @@ remove_newline(char* input)
 
 
 int
-main(void)
+main(int argCount, char **arguments)
 {
-    /*  Output echoed string  */
-	
+     char *port = argCount != 2 ? "80" : arguments[1];
+	 
      int connectionSocket,len, bytes_sent, ret;
      char *targetHost;
      int minBytes = 100;
@@ -38,7 +39,7 @@ main(void)
      while(getline(&targetHost,&minBytes, stdin))
      { 
 		remove_newline(targetHost);
-        connectionSocket =  connect_host(targetHost, "80");
+        connectionSocket =  connect_host(targetHost, port);
         bytes_sent = send(connectionSocket, msg, len, 0);
         ret = recv(connectionSocket, response, sizeof(response), 0);
         printf("Echo response: %s\n", response);
