@@ -1,17 +1,44 @@
+
 #include "socketlayer.h"
 #include <stdlib.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 
 
+
+#ifdef __unix__
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+/*windows headers*/
+#elif defined _WIN32
+#include <Windows.h>
+#include <WinSock.h>
+
+#endif
+
+
+
+
 /*
 this function shall be a reminder of the benefit
 of a good tutorial and time spent reading it
 */
+
+
+void
+close_socket(int sockfd)
+{
+#ifdef __unix__
+    close(sockfd);
+#elif defined _WIN32
+    closesocket(sockfd);
+#endif
+}
+
 int
 connect_host(const char address[], const char port[])
 {
