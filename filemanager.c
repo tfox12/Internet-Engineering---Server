@@ -6,7 +6,14 @@
 char *
 get_contents_of_file(char * filename)
 {
-    FILE * requested_file = fopen(filename,"r");
+    // first, assume that file is absolute path
+    FILE * requested_file;
+    if(
+    (requested_file = fopen(filename,"r")) == NULL)
+    {
+        // we will now try the path in the config
+    }
+    
     
     fseek (requested_file , 0 , SEEK_END);
     int filesize = ftell (requested_file);

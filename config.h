@@ -6,20 +6,23 @@
 /* needs to be figured out */
 typedef struct 
 {
+    char ** hostnames;
     char * root_dir;
 
     FILE * log;
+
     unsigned debug_enabled   : 1;
     unsigned error_enabled   : 1;
     unsigned message_enabled : 1;
     unsigned : 0; // anchor to next byte border
-} configuration;
+} ;
 
 void
 load_config(void);
 
+// passing null returns the default
 configuration *
-get_config(void);
+get_config(char * hostname);
 
 void
 unload_config(void);

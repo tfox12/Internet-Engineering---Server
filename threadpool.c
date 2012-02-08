@@ -2,10 +2,13 @@
 #include "socketqueue.h"
 #include "socketlayer.h"
 #include "httpparser.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifdef __unix__
 
 #include <pthread.h>
+#include <sys/socket.h>
 
 typedef pthread_t           thread;
 typedef pthread_mutex_t     mutex;
@@ -14,6 +17,7 @@ typedef pthread_cond_t      condition_variable;
 #elif defined _WIN32
 
 #include <Windows.h>
+#include <WinSock.h>
 
 typedef HANDLE              thread;
 typedef CRITICAL_SECTION    mutex;
@@ -97,9 +101,15 @@ thread_main(LPVOID thread_arg)
 
         char * message = read_from_socket(sockfd);
      
-        parse_request(message);
+        printf("%s\n",message);
+        
+        char response[] = "poop";
+        write_to_socket(sockfd,response,4);
+
+        printf(":D\n");
 
         free(message);
+        shutdown(sockfd,SHUT_RDWR);
     }
 
 }

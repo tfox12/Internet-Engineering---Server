@@ -6,8 +6,8 @@
 static void *
 config_data = 0;
 
-static configuration
-config_pointers;
+static configuration *
+configurations;
 
 static int
 set_root_dir(void)

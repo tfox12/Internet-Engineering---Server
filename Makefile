@@ -1,5 +1,5 @@
 phase1 : main.c threadpool.o socketlayer.o socketqueue.o httpparser.o
-	gcc -pthread -o phase1 main.c threadpool.o socketlayer.o socketqueue.o httpparser.o
+	gcc -pthread -o phase1 main.c threadpool.o socketlayer.o socketqueue.o
 threadpool.o : threadpool.c threadpool.h
 	gcc -c threadpool.c
 socketlayer.o : socketlayer.c socketlayer.h

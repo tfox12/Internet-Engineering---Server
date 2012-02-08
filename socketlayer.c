@@ -22,16 +22,6 @@ BACKLOG = 100;
 static const int
 DEFAULT_MESSAGE_SIZE = 50;
 
-static void
-close_socket(int sockfd)
-{
-#ifdef __unix__
-    close(sockfd);
-#elif defined _WIN32
-    closesocket(sockfd);
-#endif
-}
-
 int
 create_listening_socket(void)
 {
@@ -55,7 +45,7 @@ create_listening_socket(void)
     bind(sockfd,(struct sockaddr *) &addr, sizeof(addr)) < 0)
     {
         perror("socketlayer | create_listening_socket | bind");
-        close_socket(sockfd);
+        shutdown(sockfd,SHUT_RDWR);
         exit(-1);
     }
 
@@ -63,7 +53,7 @@ create_listening_socket(void)
     listen(sockfd,BACKLOG) < 0)
     {
         perror("socketlayer | create_listening_socket | bind");
-        close_socket(sockfd);
+        shutdown(sockfd,SHUT_RDWR);
         exit(-1);
     }
 
@@ -104,7 +94,7 @@ write_to_socket(int sockfd, char * message, int message_length)
             else
             {
                 perror("socketlayer | write_to_socket | send");
-			    close_socket(sockfd);
+			    shutdown(sockfd,SHUT_RDWR);
                 exit(-1);
             }
         }
@@ -112,4 +102,3 @@ write_to_socket(int sockfd, char * message, int message_length)
         message_itor += transmition_unit;
     }
 }
-
