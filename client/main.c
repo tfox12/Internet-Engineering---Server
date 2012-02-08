@@ -1,10 +1,7 @@
-#include <unistd.h>
-#include <sys/socket.h>
 #include "socketlayer.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <errno.h>
 
 #define MAX_LINE           (1000)
 static int 
