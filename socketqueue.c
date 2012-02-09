@@ -40,6 +40,9 @@ dequeue_socket(void)
         void * temp = (void*)next_in_line;        
         next_in_line = (queue_node *)next_in_line->next;
 
+        if(!next_in_line)
+            end_of_line = NULL;        
+
         free(temp);
 
         return sockfd;
