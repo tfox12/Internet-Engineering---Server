@@ -26,6 +26,12 @@ BACKLOG = 100;
 static const int
 DEFAULT_MESSAGE_SIZE = 50;
 
+static int
+listening_socket = 0;
+
+int
+get_listening_socket() { return listening_socket; }
+
 static void
 display_error(char * msg)
 {
@@ -36,12 +42,18 @@ display_error(char * msg)
 #endif
 }
 
-int
+void
 create_listening_socket(void)
 {
-
+#ifdef _WIN32
+    WSADATA data;
+#endif
     int sockfd;
     struct sockaddr_in addr;
+
+#ifdef _WIN32
+    WSAStartup(MAKEWORD(2,2),&data);
+#endif
 
     if((
     sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -73,7 +85,7 @@ create_listening_socket(void)
         exit(-1);
     }
 
-    return sockfd;
+    listening_socket = sockfd;
 
 }
 
@@ -130,3 +142,5 @@ close_socket(int sockfd)
     closesocket(sockfd);
 #endif
 }
+
+

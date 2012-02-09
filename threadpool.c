@@ -142,4 +142,3 @@ socket_has_been_queued(void)
 {
     wake_a_sleeper(&condition);
 }
-

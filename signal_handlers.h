@@ -2,6 +2,6 @@
 #define _SERVER_SIGNAL_HANDLERS_
 
 void
-reload_config
+set_handlers();
 
 #endif

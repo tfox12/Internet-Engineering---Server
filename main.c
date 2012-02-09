@@ -14,31 +14,22 @@
 #include "threadpool.h"
 #include "socketqueue.h"
 #include "config.h"
+#include "signal_handlers.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-static int
-listening_socket = 0;
+
 
 void
 initalize_system(void)
 {
-
-#ifdef _WIN32
-    WSADATA data;
-#endif
-
     load_configuration();
-    printf("Loaded config\n\t%s\n\t%d",get_document_root(),get_port_number());
+    printf("Loaded config\n\t%s\n\t%d",
+        get_document_root(),
+        get_port_number());
     threadpool_init();
-    printf("Loaded threadpool\n");
-
-#ifdef _WIN32
-    WSAStartup(MAKEWORD(2,2),&data);
-    printf("Started WinSock API\n");
-#endif
-    listening_socket = create_listening_socket();
-    printf("Listener is created: DA DA DA\n");
+    create_listening_socket();
+    set_handlers();
 }
 
 void
@@ -54,7 +45,7 @@ main(void)
     for(;;)
     {
         int sockfd = 
-            accept(listening_socket,NULL,NULL);
+            accept(get_listening_socket(),NULL,NULL);
         enqueue_socket(sockfd);
     }
 }

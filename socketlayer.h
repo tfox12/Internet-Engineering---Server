@@ -2,6 +2,9 @@
 #define _SERVER_SOCKETLAYER_
 
 int
+get_listening_socket();
+
+void
 create_listening_socket(void);
 
 char *
