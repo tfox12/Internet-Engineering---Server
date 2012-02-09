@@ -8,6 +8,7 @@
 
 #elif defined _WIN32
 
+#include <WinSock2.h> // purely for the sake of dependency
 #include <Windows.h>
 
 #endif
@@ -22,9 +23,6 @@ close_file(file_pointer file);
 
 // NOTE: data returned needs to be freed
 char *
-GET_file(file_pointer file);
-
-char *
-POST_file(char * filename, char * post_data);
+get_file_contents(file_pointer file);
 
 #endif

@@ -9,6 +9,9 @@ open_file(char * filename)
     file_pointer file;
     char * error_message;
     char * error_header;
+#ifdef _WIN32
+    OFSTRUCT open_metadata;
+#endif
     
     error_header = "Could not open ";
 
@@ -35,7 +38,8 @@ open_file(char * filename)
 #elif defined _WIN32
 
     if(
-    (file = OpenFile(filename,NULL,OF_READWRITE) == HFILE_ERROR))
+    (file = OpenFile(filename,&open_metadata,OF_READWRITE)) 
+          == HFILE_ERROR)
     {
         error_message = (char *) malloc(sizeof(filename) 
                                       + sizeof(error_header));
@@ -70,10 +74,11 @@ close_file(file_pointer file)
 }
 
 char *
-GET_file(file_pointer file)
+get_file_contents(file_pointer file)
 {
     char * data;
     int filesize;
+    DWORD bytesread;
 
 #ifdef __unix__
 
@@ -88,10 +93,9 @@ GET_file(file_pointer file)
                   NULL,NULL);
         return NULL;
     }
-
+    
     data = (char *) calloc(filesize,sizeof(char));
-
-    ReadFile((HANDLE)file,data,sizeof(data),NULL,NULL);
+    ReadFile((HANDLE)file,data,filesize,&bytesread,NULL);
 
     return data;
 

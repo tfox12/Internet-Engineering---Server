@@ -1,7 +1,9 @@
 #include "socketlayer.h"
 #include <errno.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include "config.h"
 
 /*unix headers*/
 #ifdef __unix__
@@ -24,16 +26,27 @@ BACKLOG = 100;
 static const int
 DEFAULT_MESSAGE_SIZE = 50;
 
+static void
+display_error(char * msg)
+{
+#ifdef __unix__
+    perror(msg);
+#elif defined _WIN32
+    printf("%s: ERROR %d\n",msg,WSAGetLastError());
+#endif
+}
+
 int
 create_listening_socket(void)
 {
+
     int sockfd;
     struct sockaddr_in addr;
 
     if((
     sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     {
-        perror("socketlayer | create_listening_socket | socket");
+        display_error("socketlayer | create_listening_socket | socket");
         exit(-1);
     }
     
@@ -41,13 +54,13 @@ create_listening_socket(void)
     memset(&addr,0,sizeof(addr));
 
     addr.sin_family         = AF_INET;
-    addr.sin_port           = htons(6666);
+    addr.sin_port           = htons(get_port_number());
     addr.sin_addr.s_addr    = INADDR_ANY;
-    
+    printf("\nPORT: %d\n",get_port_number());
     if(
     bind(sockfd,(struct sockaddr *) &addr, sizeof(addr)) < 0)
     {
-        perror("socketlayer | create_listening_socket | bind");
+        display_error("socketlayer | create_listening_socket | bind");
         close_socket(sockfd);
         exit(-1);
     }
@@ -55,7 +68,7 @@ create_listening_socket(void)
     if(
     listen(sockfd,BACKLOG) < 0)
     {
-        perror("socketlayer | create_listening_socket | bind");
+        display_error("socketlayer | create_listening_socket | listen");
         close_socket(sockfd);
         exit(-1);
     }
@@ -96,7 +109,7 @@ write_to_socket(int sockfd, char * message, int message_length)
             if(errno == EMSGSIZE)   transmition_unit /= 2;
             else
             {
-                perror("socketlayer | write_to_socket | send");
+                display_error("socketlayer | write_to_socket | send");
 			    close_socket(sockfd);
                 exit(-1);
             }
@@ -113,7 +126,7 @@ close_socket(int sockfd)
     shutdown(sockfd,SHUT_RDWR);
     close(sockfd);
 #elif defined _WIN32
-    closesocket(sockfd);
     shutdown(sockfd,SD_BOTH);
+    closesocket(sockfd);
 #endif
 }

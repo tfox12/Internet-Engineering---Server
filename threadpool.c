@@ -16,8 +16,8 @@ typedef pthread_cond_t      condition_variable;
 
 #elif defined _WIN32
 
+#include <WinSock2.h>
 #include <Windows.h>
-#include <WinSock.h>
 
 typedef HANDLE              thread;
 typedef CRITICAL_SECTION    mutex;
@@ -90,9 +90,9 @@ thread_main(LPVOID thread_arg)
         int sockfd;
         char * message;
         char response[] = "poop";
-
         lock_mutex(&lock);
         sockfd = dequeue_socket();
+
         if(sockfd == QUEUE_EMPTY)
         {
             wait_on_condition(&condition,&lock);
@@ -128,6 +128,7 @@ threadpool_init(void)
 #ifdef __unix__
         pthread_create(pool+idx, NULL, &thread_main, NULL);
 #elif defined _WIN32
+        InitializeCriticalSection(&lock);
         pool[idx] = CreateThread(
                         NULL, 0,
                         (LPTHREAD_START_ROUTINE)&thread_main,
