@@ -3,7 +3,9 @@
 
 #include "config.h"
 #include "filemanager.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 static const char *
 CONFIG_FILE_NAME = "server.config";
@@ -34,9 +36,9 @@ load_configuration()
         logfile,
         portnumber
     } keys;
-    
+   printf("que!?\n"); 
     config_file = open_file((char *)CONFIG_FILE_NAME);
-    printf("file opened");
+    printf("file opened\n");
     config_file_data = get_file_contents(config_file);
     printf("we have all of the file data");
     close_file(config_file);

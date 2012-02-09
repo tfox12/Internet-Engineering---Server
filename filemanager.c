@@ -2,6 +2,7 @@
 #include "config.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 file_pointer
 open_file(char * filename)
@@ -17,8 +18,9 @@ open_file(char * filename)
 
 #ifdef __unix__
 
+printf("trying to open %s\n",filename);
     if(
-    (file = open(filename,O_RDWR) < 0))
+    (file = open(filename,O_RDWR)) < 0)
     {
         error_message = (char *) malloc(sizeof(filename) 
                                       + sizeof(error_header));
@@ -30,11 +32,12 @@ open_file(char * filename)
                filename,
                sizeof(filename));
 
-        write(STDERR,error_message,sizeof(error_message));
+        write(STDERR_FILENO,error_message,sizeof(error_message));
 
         free(error_message);
     }
 
+printf("gate2\n");
 #elif defined _WIN32
 
     if(
@@ -78,11 +81,18 @@ get_file_contents(file_pointer file)
 {
     char * data;
     int filesize;
-    DWORD bytesread;
 
 #ifdef __unix__
+    filesize = lseek(file,0,SEEK_END);
+    lseek(file,0,SEEK_SET);
+
+    printf("filesize: %d\n",filesize);
+
+    data = (char *) calloc(filesize,sizeof(char));
+    read(file,data,filesize);
 
 #elif defined _WIN32
+    DWORD bytesread;
 
     if(
     (filesize = GetFileSize((HANDLE)file,NULL)) == INVALID_FILE_SIZE)
@@ -97,9 +107,9 @@ get_file_contents(file_pointer file)
     data = (char *) calloc(filesize,sizeof(char));
     ReadFile((HANDLE)file,data,filesize,&bytesread,NULL);
 
-    return data;
-
 #endif
+
+    return data;
 }
 
 char *

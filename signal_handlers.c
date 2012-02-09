@@ -1,5 +1,6 @@
 #include "signal_handlers.h"
 #include <signal.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include "socketlayer.h"
 #include "config.h"
