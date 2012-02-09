@@ -11,8 +11,10 @@
 
 /*windows headers*/
 #elif defined _WIN32
+#include <WinSock2.h> // fun fact, this must be included before windows
 #include <Windows.h>
-#include <WinSock.h>
+
+#pragma comment(lib, "Ws2_32.lib")
 
 #endif
 
@@ -25,8 +27,9 @@ DEFAULT_MESSAGE_SIZE = 50;
 int
 create_listening_socket(void)
 {
-    
     int sockfd;
+    struct sockaddr_in addr;
+
     if((
     sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     {
@@ -34,7 +37,7 @@ create_listening_socket(void)
         exit(-1);
     }
     
-    struct sockaddr_in addr;
+    
     memset(&addr,0,sizeof(addr));
 
     addr.sin_family         = AF_INET;
@@ -45,7 +48,7 @@ create_listening_socket(void)
     bind(sockfd,(struct sockaddr *) &addr, sizeof(addr)) < 0)
     {
         perror("socketlayer | create_listening_socket | bind");
-        shutdown(sockfd,SHUT_RDWR);
+        close_socket(sockfd);
         exit(-1);
     }
 
@@ -53,7 +56,7 @@ create_listening_socket(void)
     listen(sockfd,BACKLOG) < 0)
     {
         perror("socketlayer | create_listening_socket | bind");
-        shutdown(sockfd,SHUT_RDWR);
+        close_socket(sockfd);
         exit(-1);
     }
 
@@ -94,11 +97,23 @@ write_to_socket(int sockfd, char * message, int message_length)
             else
             {
                 perror("socketlayer | write_to_socket | send");
-			    shutdown(sockfd,SHUT_RDWR);
+			    close_socket(sockfd);
                 exit(-1);
             }
         }
         left_to_send -= transmition_unit;
         message_itor += transmition_unit;
     }
+}
+
+void
+close_socket(int sockfd)
+{
+#ifdef __unix__
+    shutdown(sockfd,SHUT_RDWR);
+    close(sockfd);
+#elif defined _WIN32
+    closesocket(sockfd);
+    shutdown(sockfd,SD_BOTH);
+#endif
 }

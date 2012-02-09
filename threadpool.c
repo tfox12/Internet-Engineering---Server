@@ -60,7 +60,7 @@ static void (__stdcall* unlock_mutex)(mutex *) = LeaveCriticalSection;
 
 /*because there is a parameter difference,
   we need to make this an actual call and not an alias*/
-static int
+static void
 wait_on_condition(condition_variable * cnd, mutex * mtx)
 {
 #ifdef __unix__
@@ -87,8 +87,12 @@ thread_main(LPVOID thread_arg)
 {
     for(;;)
     {
+        int sockfd;
+        char * message;
+        char response[] = "poop";
+
         lock_mutex(&lock);
-        int sockfd = dequeue_socket();
+        sockfd = dequeue_socket();
         if(sockfd == QUEUE_EMPTY)
         {
             wait_on_condition(&condition,&lock);
@@ -99,17 +103,16 @@ thread_main(LPVOID thread_arg)
 
         // as of this point we have acquired a socket file descriptor        
 
-        char * message = read_from_socket(sockfd);
+        message = read_from_socket(sockfd);
      
         printf("%s\n",message);
         
-        char response[] = "poop";
         write_to_socket(sockfd,response,4);
 
         printf(":D\n");
 
         free(message);
-        shutdown(sockfd,SHUT_RDWR);
+        close_socket(sockfd);
     }
 
 }

@@ -10,4 +10,7 @@ read_from_socket(int sockfd);
 void
 write_to_socket(int sockfd, char * message, int message_length);
 
+void
+close_socket(int sockfd);
+
 #endif
