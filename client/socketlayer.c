@@ -16,8 +16,11 @@
 
 /*windows headers*/
 #elif defined _WIN32
-#include <Windows.h>
-#include <WinSock.h>
+#define _WINSOCKAPI_    // stops windows.h including winsock.h
+#include <windows.h>
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winmm.lib")
 
 #endif
 
@@ -46,6 +49,7 @@ connect_host(const char address[], const char port[])
 	int socket_fd;
 	int status;
 	struct addrinfo hints, *serverInfo;
+		int connected_client;
 	memset(&hints,0,sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -55,7 +59,7 @@ connect_host(const char address[], const char port[])
 	if(socket_fd  == -1)
 		perror("Yo sockets ain't working right, son.");
 	
-	int connected_client;
+
 	connected_client = connect(socket_fd, serverInfo->ai_addr, serverInfo->ai_addrlen);
 	
 	if(connected_client == -1)
