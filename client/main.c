@@ -88,8 +88,6 @@ main(int argCount, char **arguments)
 		sprintf(msg, "GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP\r\n\r\n",getHttpGetTarget(targetHost));
 		formatHost(targetHost);
 		len = strlen(msg);
-		printf("%s", msg);
-		printf("%s", targetHost);
         connectionSocket =  connect_host(targetHost, port);
         bytes_sent = send(connectionSocket, msg, len, 0);
         ret = recv(connectionSocket, response, sizeof(response), 0);
