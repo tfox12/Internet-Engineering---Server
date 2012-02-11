@@ -21,8 +21,6 @@ initalize_system(void)
 char*
 getHttpGetTarget(char* target)
 {
-	int currentIndex = 0;
-	int length = 0;
 	int index = 0;
 	char targetHost[1000];
 
@@ -42,7 +40,6 @@ getHttpGetTarget(char* target)
 			targetHost[index] = '\0';
 		}
 			
-		++currentIndex;
 		++target;	
 	}
 	if(index == 0)
