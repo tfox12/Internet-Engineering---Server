@@ -22,7 +22,9 @@ char*
 getHttpGetTarget(char* target)
 {
 	int index = 0;
+	int index2 = 1;
 	char targetHost[1000];
+	targetHost[0] = '/';
 	char* temp;
 	temp = strtok(target, "://");
 	
@@ -37,9 +39,19 @@ getHttpGetTarget(char* target)
 			memset(newLine, 0, sizeof(newLine));
 		}
 			
-		if(index == 1)
+		if(index > 1)
 		{
+			//index2++;
+			targetHost[index2] = '/';
 			
+			while(*temp != '\0')
+			{
+				targetHost[index2] = *temp;
+				index2++;
+				temp++;
+			}
+			temp = strtok(NULL, "");
+			continue;
 		}
 	
 		printf("%s : index %d \n", temp, index);
@@ -50,7 +62,7 @@ getHttpGetTarget(char* target)
 	}
 	
 	
-	while(*target != '\0')
+	/*while(*target != '\0')
 	{
 		if(*target == '/')
 		{
@@ -68,14 +80,14 @@ getHttpGetTarget(char* target)
 		}
 			
 		++target;	
-	}
+	}*/
 	
 	
 	if(index == 0)
 		printf("%d", 1);
 		
 		
-	char *targetFile = index == 0 ? "/" : &targetHost;
+	char *targetFile = targetHost == NULL ? "/" : &targetHost;
 
 	printf("%s %s", targetFile, "yo mama");
 	return targetFile;
