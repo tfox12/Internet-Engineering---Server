@@ -22,9 +22,9 @@ char*
 getHttpGetTarget(char* target)
 {
 	int index = 0;
-	int index2 = 1;
+	int index2 = 0;
 	char targetHost[1000];
-	targetHost[0] = '/';
+
 	char* temp;
 	temp = strtok(target, "://");
 	
@@ -38,11 +38,15 @@ getHttpGetTarget(char* target)
 			*newLine = '\0';
 			memset(newLine, 0, sizeof(newLine));
 		}
+		
+	    printf("current Token is %s index is %d \n", temp, index);
+		
+
 			
 		if(index > 1)
 		{
-			//index2++;
 			targetHost[index2] = '/';
+			index2++;
 			
 			while(*temp != '\0')
 			{
@@ -50,6 +54,8 @@ getHttpGetTarget(char* target)
 				index2++;
 				temp++;
 			}
+			
+			index++;
 			temp = strtok(NULL, "");
 			continue;
 		}
@@ -60,27 +66,6 @@ getHttpGetTarget(char* target)
 		
 
 	}
-	
-	
-	/*while(*target != '\0')
-	{
-		if(*target == '/')
-		{
-			
-			while(*target != '\0')
-			{
-				targetHost[index] = *target;
-				index++;
-				target++;
-			
-			}
-			
-			targetHost[index] = '\0';
-			break;
-		}
-			
-		++target;	
-	}*/
 	
 	
 	if(index == 0)
