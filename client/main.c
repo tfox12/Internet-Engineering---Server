@@ -37,18 +37,14 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
 			memset(newLine, 0, sizeof(newLine));
 		}
 		
-	    printf("current Token is %s index is %d \n", temp, index);
+
 		
 		if(index == indexOfHost)
-		{
 			strcpy(targetSite, temp);
-			printf("the target site is %s", targetSite);
-		}
 		
 		
 		if(index > indexOfHost)
 		{
-			puts("inner loop");
 			targetHost[index2] = '/';
 			index2++;
 			
@@ -64,7 +60,6 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
 			continue;
 		}
 	
-		printf("%s : index %d \n", temp, index);
 		temp = strtok(NULL, "/");
 		index++;
 		
@@ -83,23 +78,14 @@ getHttpGetTarget(char* target)
 	char targetHost[1000];
 	char *protcol = strstr(target, "://");
 	char *temp;
-	if(protcol == NULL)
-	{
-		puts("YUP!");
-	
-	}
 	
 	if(protcol != NULL)
 	{
 		temp = strtok(target, "://");
-		puts("protocol found");
 		nonRootTarget = parseGetTarget(1, temp, target, targetHost);
-		
-	
 	}
 	else
 	{
-		puts("protocol not found");
 		temp = strtok(target, "/");
 		if(temp != NULL)
 			nonRootTarget = parseGetTarget(0, temp, target, targetHost);
@@ -107,8 +93,6 @@ getHttpGetTarget(char* target)
 	
 		
 	char *targetFile = nonRootTarget == 0 ? "/" : &targetHost;
-
-	printf("%s", targetFile);
 
 	return targetFile;
 
@@ -139,7 +123,6 @@ main(int argCount, char **arguments)
 
         len = strlen(msg);
         printf("%s", msg);
-        printf("%s", targetHost);
         connectionSocket =  connect_host(targetHost, port);
         bytes_sent = send(connectionSocket, msg, len, 0);
         ret = recv(connectionSocket, response, sizeof(response), 0);
