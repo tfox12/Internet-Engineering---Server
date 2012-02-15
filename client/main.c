@@ -15,10 +15,16 @@ initalize_system(void)
 }
 
 
+int
+stripNoProtocolTarget(char* temp, char* targetSite, char* targetHost)
+{
 
+
+
+}
 
 int
-stripProtocolTarget(char* temp, char* target, char*  targetHost, char* targetSite)
+stripProtocolTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
 {
 	
 	int index = 0;
@@ -41,14 +47,14 @@ stripProtocolTarget(char* temp, char* target, char*  targetHost, char* targetSit
 		
 	    printf("current Token is %s index is %d \n", temp, index);
 		
-		if(index == 1)
+		if(index == indexOfHost)
 		{
 			strcpy(targetSite, temp);
 			printf("the target site is %s", targetSite);
 		}
 		
 		
-		if(index > 1)
+		if(index > indexOfHost)
 		{
 			puts("inner loop");
 			targetHost[index2] = '/';
@@ -76,9 +82,14 @@ stripProtocolTarget(char* temp, char* target, char*  targetHost, char* targetSit
 }
 
 
-//Nothing but good intentions, hacky C code here,
-//and casual comments about it.
-//Asahanti - Prodigy
+/*Nothing but good intentions, hacky C code here,
+and casual comments about it.
+
+invocation of my demo brother
+
+
+These are some musicians I want to listen to, so there's that.
+Asahanti - Prodigy*/
 char*
 getHttpGetTarget(char* target)
 {
@@ -88,14 +99,28 @@ getHttpGetTarget(char* target)
 
 	char* temp;
 	temp = strtok(target, "://");
-	
+	sprintf("temp is %s", temp);
+	//parsing for input in protocol:// format
 	if(temp != NULL)
-		index2 = stripProtocolTarget(temp, target, targetHost, target);
+	{
+		printf("protocol found");
+		index2 = stripProtocolTarget(1, temp, target, targetHost);
+		
+	
+	}
+	//else no protocol specified
+	else
+	{
+		temp = strtok(target, "/");
+		if(temp != NULL)
+			index2 = stripProtocolTarget(0, temp, target, targetHost);
+	}
 	
 		
 	char *targetFile = index2 == 0 ? "/" : &targetHost;
 
-	printf("%s %s", targetFile, "yo mama");
+	printf("%s", targetFile);
+
 	return targetFile;
 
 }
