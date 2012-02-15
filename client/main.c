@@ -65,6 +65,8 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
 		
 
 	}
+	
+	targetHost[index2] = '\0';
 	return index2;
 }
 
