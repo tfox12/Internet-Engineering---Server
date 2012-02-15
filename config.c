@@ -10,7 +10,7 @@
 static const char *
 CONFIG_FILE_NAME = "server.config";
 
-static char *
+static file_info 
 config_file_data;
 
 static configuration
@@ -41,18 +41,18 @@ load_configuration()
     config_file_data = get_file_contents(config_file);
     close_file(config_file);
 
-    config.doc_root = strstr(config_file_data,config_keys[rootdir])
+    config.doc_root = strstr(config_file_data.data,config_keys[rootdir])
                       + strlen(config_keys[rootdir]);
     
-    log_filename = strstr(config_file_data,config_keys[logfile])
+    log_filename = strstr(config_file_data.data,config_keys[logfile])
                       + strlen(config_keys[logfile]);
     
-    port_string = strstr(config_file_data,config_keys[portnumber])
+    port_string = strstr(config_file_data.data,config_keys[portnumber])
                       + strlen(config_keys[portnumber]);
 
     /* by converting all of the returns in the string to null,
        turn the string vector into a sting matrix              */
-    str_replace_itor = config_file_data;
+    str_replace_itor = config_file_data.data;
 #ifdef __unix__
     while(str_replace_itor = strchr(str_replace_itor,'\n'))
 #elif defined _WIN32
@@ -75,7 +75,7 @@ load_configuration()
 void
 unload_configuration()
 {
-    free(config_file_data);
+    free(config_file_data.data);
 }
 
 char *
