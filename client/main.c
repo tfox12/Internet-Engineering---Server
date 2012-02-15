@@ -16,7 +16,7 @@ initalize_system(void)
 
 
 int
-parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
+parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost, char* port)
 {
 	
 	int index = 0;
@@ -40,7 +40,34 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
 
 		
 		if(index == indexOfHost)
-			strcpy(targetSite, temp);
+		{
+			char* targetPort;
+			printf("target host is: %s", temp);
+			targetPort = strchr(temp, ':');
+			if(targetPort != NULL)
+			{
+				int i = 0;
+				char* portHostSplit;
+				portHostSplit = strtok(temp, ":");
+                while(portHostSplit != NULL)
+				{
+					if(i == 1)
+						strcpy(port, portHostSplit);
+					else
+						strcpy(targetSite, portHostSplit);
+						
+					printf("current target in split is %s", portHostSplit);
+					i++;
+					portHostSplit = strtok(NULL, "");
+				
+				}
+			
+			}
+			else
+			{
+			    strcpy(targetSite, temp);
+			}
+		}
 		
 		
 		if(index > indexOfHost)
@@ -73,7 +100,7 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost)
 
 /*Method for retrieving target of HTTP GET request.*/
 char*
-getHttpGetTarget(char* target)
+getHttpGetTarget(char* target, char* port)
 {
 	int index = 0;
 	int nonRootTarget;
@@ -84,13 +111,13 @@ getHttpGetTarget(char* target)
 	if(protcol != NULL)
 	{
 		temp = strtok(target, "://");
-		nonRootTarget = parseGetTarget(1, temp, target, targetHost);
+		nonRootTarget = parseGetTarget(1, temp, target, targetHost, port);
 	}
 	else
 	{
 		temp = strtok(target, "/");
 		if(temp != NULL)
-			nonRootTarget = parseGetTarget(0, temp, target, targetHost);
+			nonRootTarget = parseGetTarget(0, temp, target, targetHost, port);
 	}
 	
 		
@@ -121,7 +148,7 @@ main(int argCount, char **arguments)
 
     while(getline(&targetHost,&minBytes, stdin))
     { 
-	    sprintf(msg, "GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP\r\n\r\n",getHttpGetTarget(targetHost));
+	    sprintf(msg, "GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP\r\n\r\n",getHttpGetTarget(targetHost,port));
 
         len = strlen(msg);
         printf("%s", msg);
