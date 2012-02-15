@@ -99,17 +99,11 @@ thread_main(LPVOID thread_arg)
             unlock_mutex(&lock);
             continue;
         }
-        unlock_mutex(&lock);
-
-        // as of this point we have acquired a socket file descriptor        
+        unlock_mutex(&lock);    
 
         message = read_from_socket(sockfd);
      
-        printf("%s\n",message);
-        
         write_to_socket(sockfd,response,4);
-
-        printf(":D\n");
 
         free(message);
         close_socket(sockfd);

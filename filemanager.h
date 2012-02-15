@@ -15,6 +15,7 @@
 
 typedef int file_pointer;
 
+// on error, returns -1
 file_pointer
 open_file(char * filename);
 

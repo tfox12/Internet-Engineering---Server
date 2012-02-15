@@ -8,58 +8,24 @@ file_pointer
 open_file(char * filename)
 {
     file_pointer file;
-    char * error_message;
-    char * error_header;
 #ifdef _WIN32
-    OFSTRUCT open_metadata;
+    OFSTRUCT open_metadata = { 0 };
 #endif
-    
-    error_header = "Could not open ";
 
 #ifdef __unix__
 
-printf("trying to open %s\n",filename);
     if(
     (file = open(filename,O_RDWR)) < 0)
     {
-        error_message = (char *) malloc(sizeof(filename) 
-                                      + sizeof(error_header));
-
-        memcpy(error_message,
-               error_header,
-               sizeof(error_header));
-        memcpy(error_message+sizeof(error_header) - 1,
-               filename,
-               sizeof(filename));
-
-        write(STDERR_FILENO,error_message,sizeof(error_message));
-
-        free(error_message);
+        printf("Couldn't open %s\n",filename);
     }
 
-printf("gate2\n");
 #elif defined _WIN32
-
     if(
     (file = OpenFile(filename,&open_metadata,OF_READWRITE)) 
           == HFILE_ERROR)
     {
-        error_message = (char *) malloc(sizeof(filename) 
-                                      + sizeof(error_header));
-
-        memcpy(error_message,
-               error_header,
-               sizeof(error_header));
-        memcpy(error_message+sizeof(error_header) - 1,
-               filename,
-               sizeof(filename));
-
-        WriteFile((HANDLE)STD_ERROR_HANDLE,
-                  error_message,
-                  sizeof(error_message),
-                  NULL,NULL);
-
-        free(error_message);
+        printf("Couldn't open file %s|\n",filename);
     }
 
 #endif
@@ -88,7 +54,7 @@ get_file_contents(file_pointer file)
 
     printf("filesize: %d\n",filesize);
 
-    data = (char *) calloc(filesize,sizeof(char));
+    data = (char *) calloc(filesize+1,sizeof(char));
     read(file,data,filesize);
 
 #elif defined _WIN32
@@ -99,21 +65,17 @@ get_file_contents(file_pointer file)
     {
         WriteFile((HANDLE)STD_ERROR_HANDLE,
                   "filemanager | GET_file | GetFileSize",
-                  sizeof("filemanager | GET_file | GetFileSize"),
+                  strlen("filemanager | GET_file | GetFileSize"),
                   NULL,NULL);
         return NULL;
     }
     
-    data = (char *) calloc(filesize,sizeof(char));
+    data = (char *) calloc(filesize + 1,sizeof(char));
     ReadFile((HANDLE)file,data,filesize,&bytesread,NULL);
-
 #endif
+    data[filesize] = 0;
 
     return data;
 }
 
-char *
-POST_file(char * filename, char * post_data)
-{
-    return 0;
-}
+

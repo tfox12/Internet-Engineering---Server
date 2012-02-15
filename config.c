@@ -36,11 +36,9 @@ load_configuration()
         logfile,
         portnumber
     } keys;
-   printf("que!?\n"); 
+
     config_file = open_file((char *)CONFIG_FILE_NAME);
-    printf("file opened\n");
     config_file_data = get_file_contents(config_file);
-    printf("we have all of the file data");
     close_file(config_file);
 
     config.doc_root = strstr(config_file_data,config_keys[rootdir])
@@ -54,9 +52,19 @@ load_configuration()
 
     /* by converting all of the returns in the string to null,
        turn the string vector into a sting matrix              */
-    while(str_replace_itor = strchr(config_file_data,'\n'))
+    str_replace_itor = config_file_data;
+#ifdef __unix__
+    while(str_replace_itor = strchr(str_replace_itor,'\n'))
+#elif defined _WIN32
+    while(str_replace_itor = strstr(str_replace_itor,"\r\n"))
+#endif
     {
         *str_replace_itor = 0;
+#ifdef __unix__
+        ++str_replace_itor;
+#elif defined _WIN32
+        str_replace_itor += 2;
+#endif
     }
 
     /* translate the cstring meta-data into actual representation */

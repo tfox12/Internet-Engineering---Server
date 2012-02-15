@@ -5,6 +5,7 @@
 #elif defined _WIN32
 
 #include <WinSock2.h>
+#include <Windows.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -18,28 +19,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-
 void
 initalize_system(void)
 {
     load_configuration();
-    printf("Loaded config\n\t%s\n\t%d",
-        get_document_root(),
-        get_port_number());
     threadpool_init();
     create_listening_socket();
     set_handlers();
 }
 
 void
-daemonize(void)
+daemonize(const char * argv[])
 {
-    // while testing, we do not want the server running as a daemon.
+
 }
 
 int
-main(void)
+main(int argc, const char * argv[])
 {
     initalize_system();
     for(;;)

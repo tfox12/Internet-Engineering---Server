@@ -22,7 +22,6 @@ get_log_pointer();
 int
 get_port_number();
 
-
 void
 unload_configuration();
 

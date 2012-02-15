@@ -54,7 +54,6 @@ create_listening_socket(void)
 #ifdef _WIN32
     WSAStartup(MAKEWORD(2,2),&data);
 #endif
-
     if((
     sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
     {
@@ -68,7 +67,7 @@ create_listening_socket(void)
     addr.sin_family         = AF_INET;
     addr.sin_port           = htons(get_port_number());
     addr.sin_addr.s_addr    = INADDR_ANY;
-    printf("\nPORT: %d\n",get_port_number());
+
     if(
     bind(sockfd,(struct sockaddr *) &addr, sizeof(addr)) < 0)
     {
@@ -86,7 +85,7 @@ create_listening_socket(void)
     }
 
     listening_socket = sockfd;
-
+    
 }
 
 char *
