@@ -14,20 +14,15 @@ initalize_system(void)
 
 }
 
-
-
-//Nothing but good intentions, hacky C code here,
-//and casual comments about it.
-char*
-getHttpGetTarget(char* target)
+int
+stripProtocolTarget(char* temp, char* target, char*  targetHost)
 {
+	
 	int index = 0;
 	int index2 = 0;
-	char targetHost[1000];
-
-	char* temp;
-	temp = strtok(target, "://");
 	
+
+
 	while(temp != NULL)
 	{	
 		char *newLine;
@@ -45,6 +40,7 @@ getHttpGetTarget(char* target)
 			
 		if(index > 1)
 		{
+			puts("inner loop");
 			targetHost[index2] = '/';
 			index2++;
 			
@@ -66,13 +62,68 @@ getHttpGetTarget(char* target)
 		
 
 	}
+	return index2;
+}
+
+
+//Nothing but good intentions, hacky C code here,
+//and casual comments about it.
+//Asahanti - Prodigy - 
+char*
+getHttpGetTarget(char* target)
+{
+	int index = 0;
+	int index2 = 0;
+	char targetHost[1000];
+
+	char* temp;
+	temp = strtok(target, "://");
+	if(temp != NULL)
+		index2 = stripProtocolTarget(temp, target, targetHost);
 	
 	
-	if(index == 0)
-		printf("%d", 1);
+	/*while(temp != NULL)
+	{	
+		char *newLine;
+		newLine = strchr(temp, '\n');
 		
+		if(newLine != NULL)
+		{
+			*newLine = '\0';
+			memset(newLine, 0, sizeof(newLine));
+		}
 		
-	char *targetFile = targetHost == NULL ? "/" : &targetHost;
+	    printf("current Token is %s index is %d \n", temp, index);
+		
+
+			
+		if(index > 1)
+		{
+			puts("inner loop");
+			targetHost[index2] = '/';
+			index2++;
+			
+			while(*temp != '\0')
+			{
+				targetHost[index2] = *temp;
+				index2++;
+				temp++;
+			}
+			
+			index++;
+			temp = strtok(NULL, "");
+			continue;
+		}
+	
+		printf("%s : index %d \n", temp, index);
+		temp = strtok(NULL, "/");
+		index++;
+		
+
+	}*/
+	
+		
+	char *targetFile = index2 == 0 ? "/" : &targetHost;
 
 	printf("%s %s", targetFile, "yo mama");
 	return targetFile;
