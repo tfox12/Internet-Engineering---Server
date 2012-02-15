@@ -24,7 +24,7 @@ static const int
 BACKLOG = 100;
 
 static const int
-DEFAULT_MESSAGE_SIZE = 50;
+DEFAULT_MESSAGE_SIZE = 1024;
 
 static int
 listening_socket = 0;
@@ -91,16 +91,19 @@ create_listening_socket(void)
 char *
 read_from_socket(int sockfd)
 {
+    int bytesread;
     char * message = (char *) calloc(DEFAULT_MESSAGE_SIZE,sizeof(char));
     int message_size = DEFAULT_MESSAGE_SIZE;
     char * message_itor = message;
 
     while(
-    recv(sockfd,message_itor,DEFAULT_MESSAGE_SIZE, 0) == DEFAULT_MESSAGE_SIZE)
+    (bytesread = recv(sockfd,message_itor,DEFAULT_MESSAGE_SIZE, 0)) == DEFAULT_MESSAGE_SIZE)
     {
         message = (char *) realloc(message,message_size += DEFAULT_MESSAGE_SIZE);
         message_itor = message + message_size - DEFAULT_MESSAGE_SIZE;
     }
+
+    *(message_itor + bytesread) = 0;
 
     return message;
 }

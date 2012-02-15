@@ -13,11 +13,11 @@ parse_request_line(http_request_data * data,
     message_itor    = strchr(message_itor,' ');
     *message_itor   = 0;
 
-    data->uri        = message_itor + 1;
+    data->uri       = ++message_itor;
     message_itor    = strchr(message_itor,' ');
     *message_itor   = 0;
 
-    data->version    = message_itor + 1;
+    data->version   = ++message_itor;
     message_itor    = strchr(message_itor,'\r');
     *message_itor   = 0;
   
@@ -61,7 +61,7 @@ parse_headers(http_request_data * data,
         message_itor       = strchr(message_itor,':');
         *message_itor      = 0;
     
-        current_value->val = message_itor + 1;
+        current_value->val = ++message_itor;
         message_itor       = strstr(message_itor,"\r\n");
         *message_itor      = 0;
     

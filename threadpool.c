@@ -89,13 +89,17 @@ thread_main(LPVOID thread_arg)
     {
         int sockfd;
         char * message;
-        char response[] = "poop";
+        http_request_data * request;
+        char_node * key_itor, * val_itor;
+
         lock_mutex(&lock);
         sockfd = dequeue_socket();
 
         if(sockfd == QUEUE_EMPTY)
         {
+            printf("going to sleep\n");
             wait_on_condition(&condition,&lock);
+            printf("WAKE UP\n");
             unlock_mutex(&lock);
             continue;
         }
@@ -103,7 +107,21 @@ thread_main(LPVOID thread_arg)
 
         message = read_from_socket(sockfd);
      
-        write_to_socket(sockfd,response,4);
+        request = parse_request(message);
+
+        printf("METHOD:%s\nURI:%s\nVERSION:%s\nHEADERS:",
+            request->method,
+            request->uri,
+            request->version);
+        for(key_itor = request->headers_keys, val_itor = request->headers_values;
+            key_itor && val_itor; 
+            key_itor = key_itor->next, val_itor = val_itor ->next)
+        {
+            printf("\n\t%s : %s",key_itor->val,val_itor->val);
+        }
+        printf("\nBODY: %s\n",request->body);
+
+        write_to_socket(sockfd,message,strlen(message));
 
         free(message);
         close_socket(sockfd);
