@@ -42,26 +42,25 @@ close_file(file_pointer file)
 #endif
 }
 
-char *
+file_info
 get_file_contents(file_pointer file)
 {
-    char * data;
-    int filesize;
+    file_info info;
 
 #ifdef __unix__
-    filesize = lseek(file,0,SEEK_END);
+    info.filesize = lseek(file,0,SEEK_END);
     lseek(file,0,SEEK_SET);
 
-    printf("filesize: %d\n",filesize);
+    printf("filesize: %d\n",info.filesize);
 
-    data = (char *) calloc(filesize+1,sizeof(char));
-    read(file,data,filesize);
+    info.data = (char *) calloc(info.filesize+1,sizeof(char));
+    read(file,info.data,info.filesize);
 
 #elif defined _WIN32
     DWORD bytesread;
 
     if(
-    (filesize = GetFileSize((HANDLE)file,NULL)) == INVALID_FILE_SIZE)
+    (info.filesize = GetFileSize((HANDLE)file,NULL)) == INVALID_FILE_SIZE)
     {
         WriteFile((HANDLE)STD_ERROR_HANDLE,
                   "filemanager | GET_file | GetFileSize",
@@ -70,12 +69,12 @@ get_file_contents(file_pointer file)
         return NULL;
     }
     
-    data = (char *) calloc(filesize + 1,sizeof(char));
-    ReadFile((HANDLE)file,data,filesize,&bytesread,NULL);
+    data = (char *) calloc(info.filesize + 1,sizeof(char));
+    ReadFile((HANDLE)file,info.data,info.filesize,&bytesread,NULL);
 #endif
-    data[filesize] = 0;
+    info.data[info.filesize] = 0;
 
-    return data;
+    return info;
 }
 
 

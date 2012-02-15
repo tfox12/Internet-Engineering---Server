@@ -100,6 +100,7 @@ thread_main(LPVOID thread_arg)
     for(;;)
     {
         int                   sockfd;
+        int                   idx;
         char                * message;
         char                * response_data;
         char                * response_itor;
@@ -108,6 +109,7 @@ thread_main(LPVOID thread_arg)
         int                   response_length;
         char_node           * key_itor, 
                             * val_itor;
+        int                   data_length;
 
         lock_mutex(&lock);
         sockfd = dequeue_socket();
@@ -145,15 +147,19 @@ thread_main(LPVOID thread_arg)
         response_length = strlen(response->version) + 1 +
                           strlen(response->code)    + 1 +
                           strlen(response->phrase)  + /* I thought ahead, phra */
-                          /*headers computed below*/+ 2 + 
-                          strlen(response->body);
+                          /*headers computed below*/+ 2;
 
         for(key_itor = response->headers_keys, val_itor = response->headers_values;
             key_itor && val_itor;
             key_itor = key_itor->next, val_itor = val_itor->next)
         {
             response_length += strlen(key_itor->val) + strlen(val_itor->val) + 4;
+            if(!strcmp(key_itor->val,HEADER_CONTENT_LENGTH))
+            {
+                data_length = atoi(val_itor->val);
+            }
         }
+        response_length += data_length;
 
         response_data = response_itor = (char *) calloc(response_length,sizeof(char));
 
@@ -185,12 +191,21 @@ thread_main(LPVOID thread_arg)
         *(response_itor++) = '\r';
         *(response_itor++) = '\n';
 
-        memcpy(response_itor,response->body,strlen(response->body));
+        memcpy(response_itor,response->body,data_length);
 
         write_to_socket(sockfd,response_data,response_length);
-        
+
+        for(idx = 0; idx < response_length; ++ idx)
+        {
+            putchar(*(response_data+idx));
+        }
+        printf("\n");
+
         free(message);
         free(response_data);
+        
+        free_request_data(request);
+        free_response_data(response);
 
         close_socket(sockfd);
     }

@@ -15,6 +15,12 @@
 
 typedef int file_pointer;
 
+typedef struct
+{
+    char * data;
+    int filesize;
+} file_info;
+
 // on error, returns -1
 file_pointer
 open_file(char * filename);
@@ -23,7 +29,7 @@ void
 close_file(file_pointer file);
 
 // NOTE: data returned needs to be freed
-char *
+file_info
 get_file_contents(file_pointer file);
 
 #endif

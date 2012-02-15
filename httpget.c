@@ -32,13 +32,34 @@ integer_to_string(int val)
     return str;
 }
 
+static char *
+match_extention_to_MIME(char * extention)
+{
+    char * mime;
+
+    if(!(strcmp(extention,"html") &&
+         strcmp(extention,"htm" ) ))
+    {
+        mime = malloc(10);
+        memcpy(mime,"text/html",10);
+    }
+    else if(!(strcmp(extention,"jpeg") &&
+              strcmp(extention,"jpg" ) ))
+    {
+        mime = malloc(11);
+        memcpy(mime,"image/jpeg",11);
+    }
+    
+    return mime;
+}
+
 http_response_data *
 handle_get(http_request_data * data)
 {
     http_response_data  * response;
     char                * resource_location;
     file_pointer          resource;
-    char                * resource_data;
+    file_info             resource_data;
     
     response = (http_response_data *) malloc(
                sizeof(http_response_data));
@@ -64,20 +85,19 @@ handle_get(http_request_data * data)
     }
     else
     {   // file found
-        char * text_html = (char *) calloc(strlen("text/html")+1,sizeof(char));
-        memcpy(text_html,"text/html",strlen("text/html")+1);
+
         response->code   = CODE_AS_STRING(CODE_FOUND);
         response->phrase = PHRASE_FOUND;
 
         resource_data    = get_file_contents(resource);
         response_add_header(response,
                             HEADER_CONTENT_LENGTH,
-                            integer_to_string(strlen(resource_data)));
+                            integer_to_string(resource_data.filesize));
         response_add_header(response,
                             HEADER_CONTENT_TYPE,
-                            text_html);
+                            match_extention_to_MIME(strchr(data->uri,'.')+1));
 
-        response->body   = resource_data;
+        response->body   = resource_data.data;
     }
 
     return response;
