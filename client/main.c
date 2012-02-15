@@ -14,8 +14,11 @@ initalize_system(void)
 
 }
 
+
+
+
 int
-stripProtocolTarget(char* temp, char* target, char*  targetHost)
+stripProtocolTarget(char* temp, char* target, char*  targetHost, char* targetSite)
 {
 	
 	int index = 0;
@@ -28,6 +31,8 @@ stripProtocolTarget(char* temp, char* target, char*  targetHost)
 		char *newLine;
 		newLine = strchr(temp, '\n');
 		
+		
+		//This check for new line needs to be moved
 		if(newLine != NULL)
 		{
 			*newLine = '\0';
@@ -36,8 +41,13 @@ stripProtocolTarget(char* temp, char* target, char*  targetHost)
 		
 	    printf("current Token is %s index is %d \n", temp, index);
 		
-
-			
+		if(index == 1)
+		{
+			strcpy(targetSite, temp);
+			printf("the target site is %s", targetSite);
+		}
+		
+		
 		if(index > 1)
 		{
 			puts("inner loop");
@@ -68,7 +78,7 @@ stripProtocolTarget(char* temp, char* target, char*  targetHost)
 
 //Nothing but good intentions, hacky C code here,
 //and casual comments about it.
-//Asahanti - Prodigy - 
+//Asahanti - Prodigy
 char*
 getHttpGetTarget(char* target)
 {
@@ -78,49 +88,9 @@ getHttpGetTarget(char* target)
 
 	char* temp;
 	temp = strtok(target, "://");
+	
 	if(temp != NULL)
-		index2 = stripProtocolTarget(temp, target, targetHost);
-	
-	
-	/*while(temp != NULL)
-	{	
-		char *newLine;
-		newLine = strchr(temp, '\n');
-		
-		if(newLine != NULL)
-		{
-			*newLine = '\0';
-			memset(newLine, 0, sizeof(newLine));
-		}
-		
-	    printf("current Token is %s index is %d \n", temp, index);
-		
-
-			
-		if(index > 1)
-		{
-			puts("inner loop");
-			targetHost[index2] = '/';
-			index2++;
-			
-			while(*temp != '\0')
-			{
-				targetHost[index2] = *temp;
-				index2++;
-				temp++;
-			}
-			
-			index++;
-			temp = strtok(NULL, "");
-			continue;
-		}
-	
-		printf("%s : index %d \n", temp, index);
-		temp = strtok(NULL, "/");
-		index++;
-		
-
-	}*/
+		index2 = stripProtocolTarget(temp, target, targetHost, target);
 	
 		
 	char *targetFile = index2 == 0 ? "/" : &targetHost;
@@ -140,6 +110,7 @@ formatHost(char* input)
 	char *temp;
 	temp = strtok(input, "://");
 	int index = 0;
+
 	
 	while(temp != NULL)
 	{
@@ -161,6 +132,7 @@ formatHost(char* input)
 	
 	/*temp = strtok(input, "://");
 	input = strtok(input,"/");*/
+	printf("the input is %s", input);
 	puts("yup");
 }
 
@@ -185,7 +157,6 @@ main(int argCount, char **arguments)
 
      while(getline(&targetHost,&minBytes, stdin))
      { 
-		
 		sprintf(msg, "GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP\r\n\r\n",getHttpGetTarget(targetHost));
 		formatHost(targetHost);
 		len = strlen(msg);
