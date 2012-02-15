@@ -103,40 +103,6 @@ getHttpGetTarget(char* target)
 
 
 
-
-void
-formatHost(char* input)
-{
-	char *temp;
-	temp = strtok(input, "://");
-	int index = 0;
-
-	
-	while(temp != NULL)
-	{
-		if(index == 3)
-			break;
-		//printf("%s%d\n", temp, index);
-		if(index == 1)
-		{
-			printf("%d", 10);
-			printf("%s %s", temp, "Debug");
-			strcpy(input,temp);
-			//printf("%s", input);
-			/*char *newline = strchr(input, '\n');
-			*newline = '\0';*/
-		}
-		temp = strtok(NULL, "//");
-		index++;
-	}
-	
-	/*temp = strtok(input, "://");
-	input = strtok(input,"/");*/
-	printf("the input is %s", input);
-	puts("yup");
-}
-
-
 int
 main(int argCount, char **arguments)
 {
@@ -158,7 +124,7 @@ main(int argCount, char **arguments)
      while(getline(&targetHost,&minBytes, stdin))
      { 
 		sprintf(msg, "GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP\r\n\r\n",getHttpGetTarget(targetHost));
-		formatHost(targetHost);
+
 		len = strlen(msg);
 		printf("%s", msg);
 		printf("%s", targetHost);
