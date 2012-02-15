@@ -6,8 +6,8 @@ static char *
 parse_request_line(http_request_data * data, 
                    char * message_itor)
 {
-    /* Request-Line   = Method SP Request-URI SP HTTP-Version CRLF */
-    
+    /* Request-Line   = Method<SP>Request-URI<SP>HTTP-Version<CRLF> */
+    char * backslash_replace;
   
     data->method    = message_itor;
     message_itor    = strchr(message_itor,' ');
@@ -20,7 +20,14 @@ parse_request_line(http_request_data * data,
     data->version   = ++message_itor;
     message_itor    = strchr(message_itor,'\r');
     *message_itor   = 0;
-  
+
+#ifdef _WIN32
+    while(backslash_replace = strchr(data->uri,'/'))
+    {
+        *backslash_replace = '\\';
+    }
+#endif
+
     return message_itor + 2;
 }
 
@@ -69,7 +76,7 @@ parse_headers(http_request_data * data,
 
     }
 
-    return message_itor;
+    return message_itor + 2;
 }
 
 http_request_data *
@@ -81,11 +88,19 @@ parse_request(char * message)
     data = 
       (http_request_data *) malloc(sizeof(http_request_data));
     memset(data,0,sizeof(http_request_data));
-
     message_itor = message;
   
-    message_itor = parse_request_line(data,message_itor);
-    message_itor = parse_headers(data,message_itor);
+    if(
+    (message_itor = parse_request_line(data,message_itor)) == NULL)
+    {
+        return NULL;
+    }
+    if(
+    (message_itor = parse_headers(data,message_itor)) == NULL)
+    {
+        return NULL;
+    }
+
     data->body = message_itor;
 
     return data;

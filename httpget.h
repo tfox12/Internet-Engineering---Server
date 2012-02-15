@@ -4,6 +4,6 @@
 #include "protoheaders.h"
 
 http_response_data *
-handle_get(char * message);
+handle_get(http_request_data * message);
 
 #endif

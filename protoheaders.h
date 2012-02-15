@@ -2,7 +2,8 @@
 #define _SERVER_PROTOHEADERS_
 
 // CODES
-#define CODE_AS_STRING(x)           ("x")
+#define CODE_AS_STRING(x)           str(x)
+#define str(x)                      #x
 // INFORMATION CODES
 #define CODE_CONTINUE               100
 #define CODE_SWITCHING_PROTOCOLS    101
@@ -95,10 +96,14 @@
 #define PHRASE_VERSION_NOT_SUPPORTED  "Version Not Supported\r\n"
 
 // HTTP VERSION
-#define HTTP_VERSION "1.1"
+#define HTTP_VERSION "HTTP/1.1"
 
 // HEADER NAMES
 #define HEADER_CONTENT_LENGTH           "Content-Length"
+#define HEADER_CONTENT_TYPE             "Content-Type"
+
+// HELPER INFORMATION
+#define RESPONSE_PADDING                6
 
 typedef struct _char_node
 {

@@ -2,6 +2,7 @@
 #include "socketqueue.h"
 #include "socketlayer.h"
 #include "httpparser.h"
+#include "httpget.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -76,6 +77,17 @@ static int (* wake_a_sleeper)(condition_variable *) = pthread_cond_signal;
 static void (__stdcall* wake_a_sleeper)(condition_variable *) = WakeConditionVariable;
 #endif
 
+static http_response_data *
+handle_request(http_request_data * request)
+{
+    if(!strcmp(request->method,"GET"))
+    {
+        return handle_get(request);
+    }
+    else
+        return NULL;
+}
+
 static
 #ifdef __unix__
 void *
@@ -87,10 +99,15 @@ thread_main(LPVOID thread_arg)
 {
     for(;;)
     {
-        int sockfd;
-        char * message;
-        http_request_data * request;
-        char_node * key_itor, * val_itor;
+        int                   sockfd;
+        char                * message;
+        char                * response_data;
+        char                * response_itor;
+        http_request_data   * request;
+        http_response_data  * response;
+        int                   response_length;
+        char_node           * key_itor, 
+                            * val_itor;
 
         lock_mutex(&lock);
         sockfd = dequeue_socket();
@@ -109,6 +126,8 @@ thread_main(LPVOID thread_arg)
      
         request = parse_request(message);
 
+        
+
         printf("METHOD:%s\nURI:%s\nVERSION:%s\nHEADERS:",
             request->method,
             request->uri,
@@ -121,9 +140,58 @@ thread_main(LPVOID thread_arg)
         }
         printf("\nBODY: %s\n",request->body);
 
-        write_to_socket(sockfd,message,strlen(message));
+        response = handle_request(request);
 
+        response_length = strlen(response->version) + 1 +
+                          strlen(response->code)    + 1 +
+                          strlen(response->phrase)  + /* I thought ahead, phra */
+                          /*headers computed below*/+ 2 + 
+                          strlen(response->body);
+
+        for(key_itor = response->headers_keys, val_itor = response->headers_values;
+            key_itor && val_itor;
+            key_itor = key_itor->next, val_itor = val_itor->next)
+        {
+            response_length += strlen(key_itor->val) + strlen(val_itor->val) + 4;
+        }
+
+        response_data = response_itor = (char *) calloc(response_length,sizeof(char));
+
+        memcpy(response_itor,response->version,strlen(response->version));
+        *(response_itor += strlen(response->version)) = ' ';
+        ++response_itor;
+
+        memcpy(response_itor,response->code,strlen(response->code));
+        *(response_itor += strlen(response->code)) = ' ';
+        ++response_itor;
+
+        memcpy(response_itor,response->phrase,strlen(response->phrase));
+        response_itor += strlen(response->phrase);
+
+        for(key_itor = response->headers_keys, val_itor = response->headers_values;
+            key_itor && val_itor;
+            key_itor = key_itor->next, val_itor = val_itor->next)
+        {
+            memcpy(response_itor,key_itor->val,strlen(key_itor->val));
+            *(response_itor += strlen(key_itor->val)) = ':';
+            *(++response_itor) = ' ';
+            ++response_itor;
+
+            memcpy(response_itor,val_itor->val,strlen(val_itor->val));
+            *(response_itor += strlen(val_itor->val)) = '\r';
+            *(++response_itor) = '\n';
+            ++response_itor;
+        }
+        *(response_itor++) = '\r';
+        *(response_itor++) = '\n';
+
+        memcpy(response_itor,response->body,strlen(response->body));
+
+        write_to_socket(sockfd,response_data,response_length);
+        
         free(message);
+        free(response_data);
+
         close_socket(sockfd);
     }
 
