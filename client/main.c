@@ -15,6 +15,15 @@ initalize_system(void)
 }
 
 
+void
+grabImages(char* htmlDoc)
+{
+	char* tempString;
+	
+
+
+}
+
 int
 parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost, char* port)
 {
@@ -42,8 +51,8 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost,
 		if(index == indexOfHost)
 		{
 			char* targetPort;
-			printf("target host is: %s", temp);
 			targetPort = strchr(temp, ':');
+			
 			if(targetPort != NULL)
 			{
 				int i = 0;
@@ -53,10 +62,11 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost,
 				{
 					if(i == 1)
 						strcpy(port, portHostSplit);
-					else
+					else if(i == 0)
 						strcpy(targetSite, portHostSplit);
-						
-					printf("current target in split is %s", portHostSplit);
+                    else if(i > 1)
+					    break;
+	
 					i++;
 					portHostSplit = strtok(NULL, "");
 				
@@ -66,6 +76,7 @@ parseGetTarget(int indexOfHost, char* temp, char* targetSite, char*  targetHost,
 			else
 			{
 			    strcpy(targetSite, temp);
+				strcpy(port, "80");
 			}
 		}
 		
@@ -119,10 +130,11 @@ getHttpGetTarget(char* target, char* port)
 		if(temp != NULL)
 			nonRootTarget = parseGetTarget(0, temp, target, targetHost, port);
 	}
-	
-		
-	char *targetFile = nonRootTarget == 0 ? "/" : &targetHost;
 
+	
+
+	char *targetFile = nonRootTarget == 0 ? "/" : &targetHost;
+    printf("nonrootTargert is %d, targetHost is %s", nonRootTarget, targetFile);
 	return targetFile;
 
 }
@@ -133,12 +145,12 @@ getHttpGetTarget(char* target, char* port)
 int
 main(int argCount, char **arguments)
 {
-	char* msg;
+	char* msg, *fileContents;
 	msg = (char *)malloc( 1000 );
 	
     char *port = argCount != 2 ? "80" : arguments[1];
-    char response[4096];
-	int connectionSocket,len, bytes_sent, ret;
+    char response[1024];
+	int connectionSocket,len, bytes_sent, responseSize;
     char *targetHost;
     int minBytes = 100;
     puts("What host shall we connect to?");
@@ -153,13 +165,32 @@ main(int argCount, char **arguments)
         len = strlen(msg);
         printf("%s", msg);
         connectionSocket =  connect_host(targetHost, port);
-        bytes_sent = send(connectionSocket, msg, len, 0);
-        ret = recv(connectionSocket, response, sizeof(response), 0);
-        printf("Echo response: %s\n", response);
-        close_socket(connectionSocket);
-        memset(response, 0, sizeof(response));
-        memset(targetHost, 0, sizeof(targetHost));
-        puts("What host shall we connect to?\n");
+		if(connectionSocket == -1)
+		{
+            close_socket(connectionSocket);
+		}
+        else
+		{
+            bytes_sent = send(connectionSocket, msg, len, 0);
+			responseSize = recv(connectionSocket, response, sizeof(response), 0);
+			fileContents = realloc(NULL, strlen(response)+1);
+			strcpy(fileContents, response);
+			
+			while(responseSize != 0)
+			{
+			// printf("Response Size: %d \n Echo response: %s\n", responseSize, response);
+			 responseSize = recv(connectionSocket, response, sizeof(response), 0);
+			 fileContents = realloc(fileContents, (strlen(fileContents) + strlen(response)+1));
+			 strcat(fileContents, response);
+			}
+			puts(fileContents);
+            close_socket(connectionSocket);
+		}
+		
+            memset(response, 0, sizeof(response));
+            memset(targetHost, 0, sizeof(targetHost));
+			memset(msg, 0, sizeof(msg));
+            puts("What host shall we connect to?\n");
      }
 
 }

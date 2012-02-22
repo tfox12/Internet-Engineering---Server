@@ -16,11 +16,9 @@
 
 /*windows headers*/
 #elif defined _WIN32
-#define _WINSOCKAPI_    // stops windows.h including winsock.h
 #include <windows.h>
 #include <winsock2.h>
-#pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "winmm.lib")
+
 
 #endif
 
@@ -63,7 +61,10 @@ connect_host(const char address[], const char port[])
 	connected_client = connect(socket_fd, serverInfo->ai_addr, serverInfo->ai_addrlen);
 	
 	if(connected_client == -1)
+	{
 		perror("error in connection");
+		return -1;
+	}
 	
 	return socket_fd;
 	
