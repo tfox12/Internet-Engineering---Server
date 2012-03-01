@@ -1,0 +1,144 @@
+#include "scripting.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+int
+uri_is_script(char * uri)
+{
+    char * extension = strchr(uri,'.') + 1;
+    if(!strcmp(extension,EXTENSION_PYTHON))
+        return SCRIPT_PYTHON;
+    if(!strcmp(extension,EXTENSION_BASH))
+        return SCRIPT_BASH;
+    return 0;
+}
+
+typedef struct
+{
+    file_pointer pipe_read;
+    file_pointer pipe_write;
+} pipe;
+
+static char *
+script_id_to_script_name(int script_id)
+{
+    switch(script_id)
+    {
+    case SCRIPT_PYTHON:     return PROCESS_PYTHON;
+    case SCRIPT_BASH:       return PROCESS_BASH;
+    default:                return 0;
+    }
+}
+
+static int
+make_pipe(pipe * anonymous_pipe)
+{
+
+#ifdef _WIN32
+    SECURITY_ATTRIBUTES attributes;
+ 
+    attributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
+    attributes.bInheritHandle = TRUE; 
+    attributes.lpSecurityDescriptor = NULL;
+
+    if(!
+    CreatePipe((PHANDLE)(&(anonymous_pipe->pipe_read )),
+               (PHANDLE)(&(anonymous_pipe->pipe_write)),
+               &attributes, 0 ))
+    {
+        printf("were not making a pipe today, boy\n");
+        return -1;
+    }
+
+    return 0;
+
+#elif defined __unix__
+
+#endif
+
+}
+
+static int
+run_script(pipe anonymous_pipe, int script_id, char * script)
+{
+
+#ifdef _WIN32
+
+    STARTUPINFO         startup_info = {0};
+    PROCESS_INFORMATION process_info = {0};
+    char                * script_name;
+    char                * temp_itor;
+    char                * command_line,
+                        * command_line_itor;
+    
+    startup_info.cb         = sizeof(startup_info);
+    startup_info.hStdOutput = (HANDLE) anonymous_pipe.pipe_write;
+    startup_info.dwFlags = STARTF_USESTDHANDLES;
+
+    if(!
+    (script_name = script_id_to_script_name(script_id)))
+    {
+        printf("yo yo yo, thats not a valid script dawg\n");
+        return -1;
+    }
+
+    command_line = command_line_itor = (char *) malloc(
+        strlen(script_name) + strlen(script) + 2);
+    
+    temp_itor = script_name;
+    while(*(command_line_itor++) = *(temp_itor++));
+    *(command_line_itor-1) = ' ';
+
+    temp_itor = script;
+    while(*(command_line_itor++) = *(temp_itor++));
+
+    if(!CreateProcess(NULL,command_line,NULL,NULL,TRUE,0,NULL,NULL,&startup_info,&process_info))
+    {
+        printf("we did not make that process, fuck!\n");
+        return -1;
+    }
+
+    WaitForSingleObject(process_info.hProcess,INFINITE);
+
+    free(command_line);
+    CloseHandle(process_info.hProcess);
+    CloseHandle(process_info.hThread);
+
+#elif defined __unix__
+
+#endif
+    return 0;
+}
+
+file_info *
+process_script(int script_id, char * script)
+{
+    /* so what we need to do is...
+        1) create a pipe
+        2) create a process (P)
+        3) dupe P's stdout to the pipe
+        4) execute the script in P , and wait for process to end
+        5) on return, read the contents of the pipe, return that
+    */
+
+    pipe        anonymous_pipe;
+    file_info   * result;
+
+    if( make_pipe  (&anonymous_pipe)                 < 0 ) return NULL;
+    if( run_script (anonymous_pipe,script_id,script) < 0 ) return NULL;
+
+    /* ASSERT: P has executed and our pipe has the output */
+    result = get_file_contents(anonymous_pipe.pipe_read);
+
+#ifdef _WIN32
+
+    CloseHandle((HANDLE)anonymous_pipe.pipe_read );
+    CloseHandle((HANDLE)anonymous_pipe.pipe_write);
+
+#elif defined __unix__
+
+#endif
+
+    return result;
+}
