@@ -29,7 +29,7 @@ void
 close_file(file_pointer file);
 
 // NOTE: data returned needs to be freed
-file_info
+file_info *
 get_file_contents(file_pointer file);
 
 #endif

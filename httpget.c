@@ -1,6 +1,7 @@
 #include "httpget.h"
 #include "config.h"
 #include"filemanager.h"
+#include "scripting.h"
 #include <string.h>
 
 // makes sure that every integer is created in a dynamic way so that
@@ -38,15 +39,16 @@ match_extention_to_MIME(char * extention)
     char * mime;
 
     if(!(strcmp(extention,"html") &&
-         strcmp(extention,"htm" ) ))
+         strcmp(extention,"htm" ) &&
+         strcmp(extention,"py"  ) ))
     {
-        mime = malloc(10);
+        mime = (char *) malloc(10);
         memcpy(mime,"text/html",10);
     }
     else if(!(strcmp(extention,"jpeg") &&
               strcmp(extention,"jpg" ) ))
     {
-        mime = malloc(11);
+        mime = (char *) malloc(11);
         memcpy(mime,"image/jpeg",11);
     }
     
@@ -59,7 +61,8 @@ handle_get(http_request_data * data)
     http_response_data  * response;
     char                * resource_location;
     file_pointer          resource;
-    file_info             resource_data;
+    file_info           * resource_data;
+    int                   script_id;
     
     response = (http_response_data *) malloc(
                sizeof(http_response_data));
@@ -73,6 +76,8 @@ handle_get(http_request_data * data)
     strcpy(resource_location,get_document_root());
     strcat(resource_location,data->uri);
     
+    
+
     if(
     (resource = open_file(resource_location)) < 0)
     {   // file not in system
@@ -89,15 +94,17 @@ handle_get(http_request_data * data)
         response->code   = CODE_AS_STRING(CODE_FOUND);
         response->phrase = PHRASE_FOUND;
 
-        resource_data    = get_file_contents(resource);
+        resource_data = (script_id = uri_is_script(data->uri)) ?
+            process_script(script_id,resource_location) : get_file_contents(resource);
+
         response_add_header(response,
                             HEADER_CONTENT_LENGTH,
-                            integer_to_string(resource_data.filesize));
+                            integer_to_string(resource_data->filesize));
         response_add_header(response,
                             HEADER_CONTENT_TYPE,
                             match_extention_to_MIME(strchr(data->uri,'.')+1));
 
-        response->body   = resource_data.data;
+        response->body   = resource_data->data;
     }
 
     return response;

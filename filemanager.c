@@ -42,10 +42,10 @@ close_file(file_pointer file)
 #endif
 }
 
-file_info
+file_info *
 get_file_contents(file_pointer file)
 {
-    file_info info;
+    file_info * info = (file_info *) malloc(sizeof(file_info));
 
 #ifdef __unix__
     info.filesize = lseek(file,0,SEEK_END);
@@ -60,19 +60,20 @@ get_file_contents(file_pointer file)
     DWORD bytesread;
 
     if(
-    (info.filesize = GetFileSize((HANDLE)file,NULL)) == INVALID_FILE_SIZE)
+    (info->filesize = GetFileSize((HANDLE)file,NULL)) == INVALID_FILE_SIZE)
     {
         WriteFile((HANDLE)STD_ERROR_HANDLE,
                   "filemanager | GET_file | GetFileSize",
                   strlen("filemanager | GET_file | GetFileSize"),
                   NULL,NULL);
+
         return NULL;
     }
     
-    data = (char *) calloc(info.filesize + 1,sizeof(char));
-    ReadFile((HANDLE)file,info.data,info.filesize,&bytesread,NULL);
+    info->data = (char *) calloc(info->filesize + 1,sizeof(char));
+    ReadFile((HANDLE)file,info->data,info->filesize,&bytesread,NULL);
 #endif
-    info.data[info.filesize] = 0;
+    info->data[info->filesize] = 0;
 
     return info;
 }
