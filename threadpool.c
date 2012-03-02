@@ -3,14 +3,18 @@
 #include "socketlayer.h"
 #include "httpparser.h"
 #include "httpget.h"
+#include "logger.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #ifdef __unix__
 
 #include <pthread.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 typedef pthread_t           thread;
 typedef pthread_mutex_t     mutex;
@@ -100,7 +104,7 @@ thread_main(LPVOID thread_arg)
 {
     for(;;)
     {
-        int                   sockfd;
+        queue_node          * request_info;
         int                   idx;
         char                * message;
         char                * response_data;
@@ -111,103 +115,99 @@ thread_main(LPVOID thread_arg)
         char_node           * key_itor, 
                             * val_itor;
         int                   data_length;
+        time_t                timestamp;
 
         lock_mutex(&lock);
-        sockfd = dequeue_socket();
+        request_info = dequeue_socket();
 
-        if(sockfd == QUEUE_EMPTY)
+        if(request_info == NULL)
         {
-            printf("going to sleep\n");
             wait_on_condition(&condition,&lock);
-            printf("WAKE UP\n");
             unlock_mutex(&lock);
             continue;
         }
         unlock_mutex(&lock);    
+printf("a");
+        timestamp = time(NULL);
 
+        printf("%s(%x):%i\r\n",inet_ntoa(request_info->client.sin_addr),
+                               ntohl(request_info->client.sin_addr.s_addr),
+                               ntohs(request_info->client.sin_port));
         
-        while(*(message = read_from_socket(sockfd)))
+        message = read_from_socket(request_info->socket);
+    
+printf("b");
+        request = parse_request(message);
+printf("c");
+
+        response = handle_request(request);
+printf("d");
+
+
+        response_length = strlen(response->version) + 1 +
+                          strlen(response->code)    + 1 +
+                          strlen(response->phrase)  + /* I thought ahead, phra */
+                          /*headers computed below*/+ 2;
+
+printf("e");
+        for(key_itor = response->headers_keys, val_itor = response->headers_values;
+            key_itor && val_itor;
+            key_itor = key_itor->next, val_itor = val_itor->next)
         {
-            request = parse_request(message);
-
-            printf("METHOD:%s\nURI:%s\nVERSION:%s\nHEADERS:",
-                request->method,
-                request->uri,
-                request->version);
-            for(key_itor = request->headers_keys, val_itor = request->headers_values;
-                key_itor && val_itor; 
-                key_itor = key_itor->next, val_itor = val_itor ->next)
+            response_length += strlen(key_itor->val) + strlen(val_itor->val) + 4;
+            if(!strcmp(key_itor->val,HEADER_CONTENT_LENGTH))
             {
-                printf("\n\t%s : %s",key_itor->val,val_itor->val);
+                data_length = atoi(val_itor->val);
             }
-            printf("\nBODY: %s\n",request->body);
-
-            response = handle_request(request);
-
-            response_length = strlen(response->version) + 1 +
-                              strlen(response->code)    + 1 +
-                              strlen(response->phrase)  + /* I thought ahead, phra */
-                              /*headers computed below*/+ 2;
-
-            for(key_itor = response->headers_keys, val_itor = response->headers_values;
-                key_itor && val_itor;
-                key_itor = key_itor->next, val_itor = val_itor->next)
-            {
-                response_length += strlen(key_itor->val) + strlen(val_itor->val) + 4;
-                if(!strcmp(key_itor->val,HEADER_CONTENT_LENGTH))
-                {
-                    data_length = atoi(val_itor->val);
-                }
-            }
-            response_length += data_length;
-
-            response_data = response_itor = (char *) calloc(response_length,sizeof(char));
-
-            memcpy(response_itor,response->version,strlen(response->version));
-            *(response_itor += strlen(response->version)) = ' ';
-            ++response_itor;
-
-            memcpy(response_itor,response->code,strlen(response->code));
-            *(response_itor += strlen(response->code)) = ' ';
-            ++response_itor;
-
-            memcpy(response_itor,response->phrase,strlen(response->phrase));
-            response_itor += strlen(response->phrase);
-
-            for(key_itor = response->headers_keys, val_itor = response->headers_values;
-                key_itor && val_itor;
-                key_itor = key_itor->next, val_itor = val_itor->next)
-            {
-                memcpy(response_itor,key_itor->val,strlen(key_itor->val));
-                *(response_itor += strlen(key_itor->val)) = ':';
-                *(++response_itor) = ' ';
-                ++response_itor;
-
-                memcpy(response_itor,val_itor->val,strlen(val_itor->val));
-                *(response_itor += strlen(val_itor->val)) = '\r';
-                *(++response_itor) = '\n';
-                ++response_itor;
-            }
-            *(response_itor++) = '\r';
-            *(response_itor++) = '\n';
-
-            memcpy(response_itor,response->body,data_length);
-
-            write_to_socket(sockfd,response_data,response_length);
-
-            for(idx = 0; idx < response_length; ++ idx)
-            {
-                putchar(*(response_data+idx));
-            }
-            printf("\n");
-
-            free(response_data);
-            free_request_data(request);
-            free_response_data(response);
         }
+        response_length += data_length;
 
+        response_data = response_itor = (char *) calloc(response_length,sizeof(char));
+
+        memcpy(response_itor,response->version,strlen(response->version));
+        *(response_itor += strlen(response->version)) = ' ';
+        ++response_itor;
+
+        memcpy(response_itor,response->code,strlen(response->code));
+        *(response_itor += strlen(response->code)) = ' ';
+        ++response_itor;
+
+        memcpy(response_itor,response->phrase,strlen(response->phrase));
+        response_itor += strlen(response->phrase);
+
+        for(key_itor = response->headers_keys, val_itor = response->headers_values;
+            key_itor && val_itor;
+            key_itor = key_itor->next, val_itor = val_itor->next)
+        {
+            memcpy(response_itor,key_itor->val,strlen(key_itor->val));
+            *(response_itor += strlen(key_itor->val)) = ':';
+            *(++response_itor) = ' ';
+            ++response_itor;
+
+            memcpy(response_itor,val_itor->val,strlen(val_itor->val));
+            *(response_itor += strlen(val_itor->val)) = '\r';
+            *(++response_itor) = '\n';
+            ++response_itor;
+        }
+        *(response_itor++) = '\r';
+        *(response_itor++) = '\n';
+
+        memcpy(response_itor,response->body,data_length);
+
+        write_to_socket(request_info->socket,response_data,response_length);
+
+        log_message(inet_ntoa(request_info->client.sin_addr),
+                    ctime(&timestamp),
+                    request->method,
+                    request->uri,
+                    response->code);
+
+        free(response_data);
+        free_request_data(request);
+        free_response_data(response);
         free(message);     
-        close_socket(sockfd);
+        close_socket(request_info->socket);
+        free(request_info);
     }
 
 }

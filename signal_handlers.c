@@ -8,11 +8,6 @@
 static void
 safe_close(int signum)
 {
-    // probably the best thing would be to clear the queue, then clean it
-
-    printf("cleaning up my shit!\n");
-    // so what do we need to do?
-    
     // close our listener
     close_socket(get_listening_socket());
 

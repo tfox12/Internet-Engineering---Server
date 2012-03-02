@@ -2,23 +2,18 @@
 #include "threadpool.h"
 #include <stdlib.h>
 
-typedef struct
-{
-    int     socket;
-    void *  next;
-} queue_node;
-
 static queue_node 
 *next_in_line    = NULL,
 *end_of_line     = NULL;
 
 void
-enqueue_socket(int sockfd)
+enqueue_socket(int sockfd, struct sockaddr_in client)
 {
     queue_node * temp = 
         (queue_node*) malloc(sizeof(queue_node));
 
     temp->socket = sockfd;
+    temp->client = client;
     temp->next = NULL;
 
     if(end_of_line) 
@@ -31,7 +26,7 @@ enqueue_socket(int sockfd)
     socket_has_been_queued();
 }
 
-int
+queue_node*
 dequeue_socket(void)
 {
     if(next_in_line)
@@ -43,9 +38,7 @@ dequeue_socket(void)
         if(!next_in_line)
             end_of_line = NULL;
 
-        free(temp);
-
-        return sockfd;
+        return temp;
     }
-    else return QUEUE_EMPTY; 
+    else return NULL; 
 }

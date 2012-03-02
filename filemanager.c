@@ -59,32 +59,22 @@ get_file_contents(file_pointer file)
     int  file_size     = 0,
          bytes_read    = 0;
 
-printf("begin\n");
     while((bytes_read = read(file,temp_buffer,temp_buff_size)) > 0)
     {
-        printf("bytes_read: %i\n",bytes_read);
-        printf("a\n");
         buffer_size  += temp_buff_size;
         file_size    += bytes_read;
-
-        printf("b\n");
 
         char * cpy_buffer = (char *) calloc(buffer_size,sizeof(char));
         for(buffer_offset = 0; buffer_size - buffer_offset > temp_buff_size; ++buffer_offset)
         {
             cpy_buffer[buffer_offset] = buffer[buffer_offset];
         }
-        printf("c\n");
         for(temp_offset = 0; buffer_size - buffer_offset >= 0; ++buffer_offset, ++temp_offset)
         {
-            if(!(cpy_buffer || buffer))
-            printf("yup, null pointer");
             cpy_buffer[buffer_offset] = temp_buffer[temp_offset];
         }
-        printf("d\n");
         free(buffer);
         buffer = cpy_buffer;
-        printf("e\n");
 
     }
     if(bytes_read == -1)
@@ -93,18 +83,14 @@ printf("begin\n");
         return NULL;
     }
 
-        printf("f\n");
     if(file_size == buffer_size)
     {
         buffer = realloc(buffer,buffer_size+1); // one more array element for that fucking null char
     }
 
-        printf("g\n");
-    printf("filesize: %i\n",file_size);
     info->filesize = file_size;
     info->data = buffer;
 
-        printf("h\n");
 #elif defined _WIN32
     DWORD bytesread;
 
@@ -123,8 +109,6 @@ printf("begin\n");
     ReadFile((HANDLE)file,info->data,info->filesize,&bytesread,NULL);
 #endif
     info->data[info->filesize] = 0;
-        printf("i\n");
-printf("end\n");
     return info;
 }
 

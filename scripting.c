@@ -135,7 +135,6 @@ run_script(ipc_pipe anonymous_pipe, int script_id, char * script)
     {
         close(anonymous_pipe.pipe_write);
         wait(&return_status); 
-        printf("returned with status %i\n",return_status); 
     }
 
 #endif

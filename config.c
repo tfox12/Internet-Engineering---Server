@@ -40,7 +40,6 @@ load_configuration()
     config_file = open_file((char *)CONFIG_FILE_NAME);
     config_file_data = get_file_contents(config_file);
     close_file(config_file);
-printf("%s\n",config_file_data->data);
     config.doc_root = strstr(config_file_data->data,config_keys[rootdir])
                       + strlen(config_keys[rootdir]);
     

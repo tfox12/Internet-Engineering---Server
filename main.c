@@ -22,20 +22,10 @@
 void
 initalize_system(void)
 {
-printf("load_conf\n");
     load_configuration();
-printf("threadpool\n");
     threadpool_init();
-printf("create_sock\n");
     create_listening_socket();
-printf("handlers\n");
     set_handlers();
-}
-
-void
-daemonize(const char * argv[])
-{
-
 }
 
 int
@@ -44,8 +34,11 @@ main(int argc, const char * argv[])
     initalize_system();
     for(;;)
     {
-        int sockfd = 
-            accept(get_listening_socket(),NULL,NULL);
-        enqueue_socket(sockfd);
+        struct sockaddr_in client;
+        socklen_t socket_length;
+        int sockfd = accept(get_listening_socket(),
+                            (struct sockaddr *)&client,
+                            &socket_length);
+        enqueue_socket(sockfd,client);
     }
 }
