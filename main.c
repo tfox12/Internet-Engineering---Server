@@ -34,8 +34,8 @@ main(int argc, const char * argv[])
     initalize_system();
     for(;;)
     {
-        struct sockaddr_in client;
-        socklen_t socket_length;
+        struct sockaddr_in client = {0};
+        int socket_length = sizeof(client);
         int sockfd = accept(get_listening_socket(),
                             (struct sockaddr *)&client,
                             &socket_length);

@@ -105,7 +105,6 @@ thread_main(LPVOID thread_arg)
     for(;;)
     {
         queue_node          * request_info;
-        int                   idx;
         char                * message;
         char                * response_data;
         char                * response_itor;
@@ -127,7 +126,7 @@ thread_main(LPVOID thread_arg)
             continue;
         }
         unlock_mutex(&lock);    
-printf("a");
+
         timestamp = time(NULL);
 
         printf("%s(%x):%i\r\n",inet_ntoa(request_info->client.sin_addr),
@@ -135,21 +134,17 @@ printf("a");
                                ntohs(request_info->client.sin_port));
         
         message = read_from_socket(request_info->socket);
-    
-printf("b");
+        if(!(*message)) continue;
+
         request = parse_request(message);
-printf("c");
 
         response = handle_request(request);
-printf("d");
-
 
         response_length = strlen(response->version) + 1 +
                           strlen(response->code)    + 1 +
                           strlen(response->phrase)  + /* I thought ahead, phra */
                           /*headers computed below*/+ 2;
 
-printf("e");
         for(key_itor = response->headers_keys, val_itor = response->headers_values;
             key_itor && val_itor;
             key_itor = key_itor->next, val_itor = val_itor->next)

@@ -14,19 +14,11 @@ open_file(char * filename)
 
 #ifdef __unix__
 
-    if(
-    (file = open(filename,O_RDWR)) < 0)
-    {
-        printf("Couldn't open %s\n",filename);
-    }
+    file = open(filename,O_RDWR);
 
 #elif defined _WIN32
-    if(
-    (file = OpenFile(filename,&open_metadata,OF_READWRITE)) 
-          == HFILE_ERROR)
-    {
-        printf("Couldn't open file %s|\n",filename);
-    }
+
+    file = OpenFile(filename,&open_metadata,OF_READWRITE);
 
 #endif
     return file;

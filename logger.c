@@ -14,6 +14,9 @@ log_message(char * ip_address,
     //   <ip><SP><ts><SP><mthd><SP><doc_nam><SP<srv_stat><CRLF>
     char * message;
     char * newline = strchr(time_stamp,'\n');
+#ifdef _WIN32
+    DWORD  bytes_written;
+#endif
     if(newline) *newline = 0;
 
     message  = (char *) calloc( 
@@ -30,6 +33,7 @@ log_message(char * ip_address,
                                          method,
                                          document_name,
                                          server_status);
+    WriteFile((HANDLE)get_log_pointer(),message,strlen(message),&bytes_written,NULL);
 #elif defined __unix__
                                         7, sizeof(char));
 
