@@ -8,7 +8,7 @@
 
 #elif defined _WIN32
 
-#include <WinSock2.h> // purely for the sake of dependency
+#include <WinSock2.h> // winsock needs to be included before windows
 #include <Windows.h>
 
 #endif

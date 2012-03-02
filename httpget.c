@@ -3,6 +3,7 @@
 #include"filemanager.h"
 #include "scripting.h"
 #include <string.h>
+#include <stdlib.h>
 
 // makes sure that every integer is created in a dynamic way so that
 // cleaning up the response structure can be done in a consistant way

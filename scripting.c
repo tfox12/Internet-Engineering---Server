@@ -18,7 +18,7 @@ typedef struct
 {
     file_pointer pipe_read;
     file_pointer pipe_write;
-} pipe;
+} ipc_pipe;
 
 static char *
 script_id_to_script_name(int script_id)
@@ -32,10 +32,11 @@ script_id_to_script_name(int script_id)
 }
 
 static int
-make_pipe(pipe * anonymous_pipe)
+make_pipe(ipc_pipe * anonymous_pipe)
 {
 
 #ifdef _WIN32
+
     SECURITY_ATTRIBUTES attributes;
  
     attributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
@@ -55,12 +56,25 @@ make_pipe(pipe * anonymous_pipe)
 
 #elif defined __unix__
 
+    file_pointer duplex[2];    
+
+    if(pipe(duplex) < 0)
+    {
+        printf("were not making a pipe today, boy\n");
+        return -1;
+    }
+
+    anonymous_pipe->pipe_write = duplex[1];
+    anonymous_pipe->pipe_read  = duplex[0];
+
+    return 0;
+
 #endif
 
 }
 
 static int
-run_script(pipe anonymous_pipe, int script_id, char * script)
+run_script(ipc_pipe anonymous_pipe, int script_id, char * script)
 {
 
 #ifdef _WIN32
@@ -107,7 +121,25 @@ run_script(pipe anonymous_pipe, int script_id, char * script)
 
 #elif defined __unix__
 
+    int return_status;
+
+    if(fork() == 0) // child process
+    {
+        dup2(anonymous_pipe.pipe_write,STDOUT_FILENO);
+        close(anonymous_pipe.pipe_read );
+        execlp(script_id_to_script_name(script_id),
+               script_id_to_script_name(script_id),
+               script,NULL);       
+    }
+    else
+    {
+        close(anonymous_pipe.pipe_write);
+        wait(&return_status); 
+        printf("returned with status %i\n",return_status); 
+    }
+
 #endif
+
     return 0;
 }
 
@@ -122,14 +154,16 @@ process_script(int script_id, char * script)
         5) on return, read the contents of the pipe, return that
     */
 
-    pipe        anonymous_pipe;
+    ipc_pipe    anonymous_pipe;
     file_info   * result;
 
     if( make_pipe  (&anonymous_pipe)                 < 0 ) return NULL;
     if( run_script (anonymous_pipe,script_id,script) < 0 ) return NULL;
 
+    
+
     /* ASSERT: P has executed and our pipe has the output */
-    result = get_file_contents(anonymous_pipe.pipe_read);
+    result = get_file_contents(anonymous_pipe.pipe_read); 
 
 #ifdef _WIN32
 
@@ -137,6 +171,8 @@ process_script(int script_id, char * script)
     CloseHandle((HANDLE)anonymous_pipe.pipe_write);
 
 #elif defined __unix__
+
+    close(anonymous_pipe.pipe_read );
 
 #endif
 

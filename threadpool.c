@@ -5,6 +5,7 @@
 #include "httpget.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __unix__
 

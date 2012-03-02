@@ -22,9 +22,13 @@
 void
 initalize_system(void)
 {
+printf("load_conf\n");
     load_configuration();
+printf("threadpool\n");
     threadpool_init();
+printf("create_sock\n");
     create_listening_socket();
+printf("handlers\n");
     set_handlers();
 }
 
