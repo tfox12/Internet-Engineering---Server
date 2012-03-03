@@ -161,14 +161,12 @@ thread_main(LPVOID thread_arg)
         printf("%s(%x):%i\r\n",inet_ntoa(request_info->client.sin_addr),
                                ntohl(request_info->client.sin_addr.s_addr),
                                ntohs(request_info->client.sin_port));
-        
         /* read the data from the socket */
         message = read_from_socket(request_info->socket);
         if(!(*message)) continue;
 
         /* parse the data from the socket */
         request = parse_request(message);
-
         /* choose the correct handler and that handler will create
            response data */
         response = handle_request(request);

@@ -52,7 +52,10 @@ log_message(char * ip_address,
                                          document_name,
                                          server_status);
 
-    write(get_log_pointer(),message,strlen(message));
+    if(write(get_log_pointer(),message,strlen(message)) < 0)
+    {
+        perror("logger | log_message | write");
+    }
     
 #endif
     
