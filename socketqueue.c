@@ -1,3 +1,11 @@
+/*************************************************************************** 
+GROUP: 
+MEMBERS: 1. Tim Fox, 2. Adam Davis
+DATE: 3.3.2012
+CS 4/55231 INTERNETENGINEERING 2012 SPRING 
+INSTRUCTOR: Javed Khan 
+***************************************************************************/
+
 #include "socketqueue.h"
 #include "threadpool.h"
 #include <stdlib.h>
@@ -32,7 +40,7 @@ dequeue_socket(void)
     if(next_in_line)
     {
         int sockfd = next_in_line->socket;
-        void * temp = (void*)next_in_line;        
+        queue_node * temp = next_in_line;        
         next_in_line = (queue_node *)next_in_line->next;
 
         if(!next_in_line)

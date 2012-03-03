@@ -1,3 +1,11 @@
+/*************************************************************************** 
+GROUP: 
+MEMBERS: 1. Tim Fox, 2. Adam Davis
+DATE: 3.3.2012
+CS 4/55231 INTERNETENGINEERING 2012 SPRING 
+INSTRUCTOR: Javed Khan 
+***************************************************************************/
+
 #include "filemanager.h"
 #include "config.h"
 #include <stdlib.h>
@@ -71,7 +79,7 @@ get_file_contents(file_pointer file)
     }
     if(bytes_read == -1)
     {
-        perror("fuckjfkdlsa;jfkl;sd");
+        perror("filemanager | get_file_contents | read");
         return NULL;
     }
 

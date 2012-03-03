@@ -1,3 +1,11 @@
+/*************************************************************************** 
+GROUP: 
+MEMBERS: 1. Tim Fox, 2. Adam Davis
+DATE: 3.3.2012
+CS 4/55231 INTERNETENGINEERING 2012 SPRING 
+INSTRUCTOR: Javed Khan 
+***************************************************************************/
+
 #ifndef _SERVER_PROTOHEADERS_
 #define _SERVER_PROTOHEADERS_
 
@@ -105,12 +113,23 @@
 // HELPER INFORMATION
 #define RESPONSE_PADDING                6
 
+/**************************************************************************** 
+GROUP NAME: 
+DATA STRUCTURE DEVELOPER: Tim Fox
+DATA STRUCTURE DESCRIPTION: A node in a linked list of cstrings.
+****************************************************************************/
 typedef struct _char_node
 {
     char      * val;
     struct _char_node * next;
 } char_node;
 
+/**************************************************************************** 
+GROUP NAME: 
+DATA STRUCTURE DEVELOPER: Tim Fox
+DATA STRUCTURE DESCRIPTION: A series of pointers that point to HTTP request
+    meta-data.
+****************************************************************************/
 typedef struct
 {
 // request line
@@ -124,6 +143,12 @@ typedef struct
     char *  body;
 } http_request_data;
 
+/**************************************************************************** 
+GROUP NAME: 
+DATA STRUCTURE DEVELOPER: Tim Fox
+DATA STRUCTURE DESCRIPTION: A series of pointers that point to HTTP response
+    meta-data.
+****************************************************************************/
 typedef struct
 {
 // status line
@@ -137,12 +162,30 @@ typedef struct
     char *  body;
 } http_response_data;
 
+/**************************************************************************** 
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Properly cleans up the linked list in a request
+    structure, as well as the structure itself.
+****************************************************************************/
 void
 free_request_data(http_request_data * data);
 
+/**************************************************************************** 
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Properly cleans up the linked list in a response
+    structure, as well as the structure itself.
+****************************************************************************/
 void
 free_response_data(http_response_data * data);
 
+/**************************************************************************** 
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: inserts a new key node and a new value node into a
+    response structure.
+****************************************************************************/
 void
 response_add_header(http_response_data * data,char * key, char * val);
 

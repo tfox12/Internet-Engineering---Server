@@ -1,3 +1,11 @@
+/*************************************************************************** 
+GROUP: 
+MEMBERS: 1. Tim Fox, 2. Adam Davis
+DATE: 3.3.2012
+CS 4/55231 INTERNETENGINEERING 2012 SPRING 
+INSTRUCTOR: Javed Khan 
+***************************************************************************/
+
 #include "threadpool.h"
 #include "socketqueue.h"
 #include "socketlayer.h"
@@ -37,6 +45,9 @@ typedef CONDITION_VARIABLE  condition_variable;
 
 static thread
 pool[NUM_THREADS];
+
+/* below are various typedef's for cross platform
+   capabilities */
 
 static mutex
 #ifdef __unix__
@@ -117,6 +128,8 @@ thread_main(LPVOID thread_arg)
         time_t                timestamp;
 
         lock_mutex(&lock);
+
+        /* Get a socket */
         request_info = dequeue_socket();
 
         if(request_info == NULL)
@@ -133,13 +146,19 @@ thread_main(LPVOID thread_arg)
                                ntohl(request_info->client.sin_addr.s_addr),
                                ntohs(request_info->client.sin_port));
         
+        /* read the data from the socket */
         message = read_from_socket(request_info->socket);
         if(!(*message)) continue;
 
+        /* parse the data from the socket */
         request = parse_request(message);
 
+        /* choose the correct handler and that handler will create
+           response data */
         response = handle_request(request);
 
+        /* turn response data into a response message */
+        /* NOTE: this code should be moved into a "httpresponse" file */
         response_length = strlen(response->version) + 1 +
                           strlen(response->code)    + 1 +
                           strlen(response->phrase)  + /* I thought ahead, phra */
@@ -189,14 +208,18 @@ thread_main(LPVOID thread_arg)
 
         memcpy(response_itor,response->body,data_length);
 
+        /* write our response string into the socket */
         write_to_socket(request_info->socket,response_data,response_length);
 
+
+        /* log it */
         log_message(inet_ntoa(request_info->client.sin_addr),
                     ctime(&timestamp),
                     request->method,
                     request->uri,
                     response->code);
 
+        /* clean up our mess */
         free(response_data);
         free_request_data(request);
         free_response_data(response);
