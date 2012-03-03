@@ -13,11 +13,21 @@ INSTRUCTOR: Javed Khan
 #include <string.h>
 #include <stdlib.h>
 
-// makes sure that every integer is created in a dynamic way so that
-// cleaning up the response structure can be done in a consistant way
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Converts a string representation of an integer. Used to
+    take the filesize and create a text version for the response. Used for response header, therefor dynamic data will be
+    cleaned if protoheaders::free_response_data is called.
+****************************************************************************/
 static char *
 integer_to_string(int val)
 {
+    // makes sure that every integer is created in a dynamic way so that
+    // cleaning up the response structure can be done in a consistant way
+
     char * str;
     char * str_itor;
     int copy_of_val;
@@ -42,20 +52,29 @@ integer_to_string(int val)
     return str;
 }
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Returns the specific MIME type associated with a file 
+    extension. Used for response header, therefor dynamic data will be
+    cleaned if protoheaders::free_response_data is called.
+****************************************************************************/
 static char *
-match_extention_to_MIME(char * extention)
+match_extention_to_MIME(char * extension)
 {
     char * mime;
 
-    if(!(strcmp(extention,"html") &&
-         strcmp(extention,"htm" ) &&
-         strcmp(extention,"py"  ) ))
+    if(!(strcmp(extension,"html") &&
+         strcmp(extension,"htm" ) &&
+         strcmp(extension,"py"  ) ))
     {
         mime = (char *) malloc(10);
         memcpy(mime,"text/html",10);
     }
-    else if(!(strcmp(extention,"jpeg") &&
-              strcmp(extention,"jpg" ) ))
+    else if(!(strcmp(extension,"jpeg") &&
+              strcmp(extension,"jpg" ) ))
     {
         mime = (char *) malloc(11);
         memcpy(mime,"image/jpeg",11);
@@ -64,6 +83,7 @@ match_extention_to_MIME(char * extention)
     return mime;
 }
 
+/***************************************************************************/
 http_response_data *
 handle_get(http_request_data * data)
 {

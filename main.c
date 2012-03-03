@@ -27,7 +27,14 @@ INSTRUCTOR: Javed Khan
 #include <stdlib.h>
 #include <stdio.h>
 
-void
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Calls all of the start-up phase sub-routines.
+****************************************************************************/
+static void
 initalize_system(void)
 {
     load_configuration();

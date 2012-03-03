@@ -24,6 +24,7 @@ config_file_data;
 static configuration
 config;
 
+/***************************************************************************/
 void
 load_configuration()
 {
@@ -79,6 +80,8 @@ load_configuration()
     config.port_number = atoi(port_string);
 
 }
+
+/***************************************************************************/
 void
 unload_configuration()
 {
@@ -86,18 +89,21 @@ unload_configuration()
     free(config_file_data);
 }
 
+/***************************************************************************/
 char *
 get_document_root()
 {
     return config.doc_root;
 }
 
+/***************************************************************************/
 file_pointer
 get_log_pointer()
 {
     return config.log;
 }
 
+/***************************************************************************/
 int
 get_port_number()
 {

@@ -12,6 +12,7 @@ INSTRUCTOR: Javed Khan
 #include <stdio.h>
 #include <string.h>
 
+/***************************************************************************/
 file_pointer
 open_file(char * filename)
 {
@@ -32,6 +33,7 @@ open_file(char * filename)
     return file;
 }
 
+/***************************************************************************/
 void
 close_file(file_pointer file)
 {
@@ -42,6 +44,7 @@ close_file(file_pointer file)
 #endif
 }
 
+/***************************************************************************/
 file_info *
 get_file_contents(file_pointer file)
 {

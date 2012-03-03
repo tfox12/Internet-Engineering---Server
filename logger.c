@@ -11,6 +11,7 @@ INSTRUCTOR: Javed Khan
 #include <string.h>
 #include <stdlib.h>
 
+/**************************************************************************/
 int
 log_message(char * ip_address,
             char * time_stamp, 

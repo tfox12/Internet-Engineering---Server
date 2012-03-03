@@ -47,7 +47,8 @@ static thread
 pool[NUM_THREADS];
 
 /* below are various typedef's for cross platform
-   capabilities */
+   capabilities. This also includes function pointers that
+   map a facade to the appropriate platform's API. */
 
 static mutex
 #ifdef __unix__
@@ -93,6 +94,14 @@ static int (* wake_a_sleeper)(condition_variable *) = pthread_cond_signal;
 static void (__stdcall* wake_a_sleeper)(condition_variable *) = WakeConditionVariable;
 #endif
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Chooses the correct handler according to the request
+    data.
+****************************************************************************/
 static http_response_data *
 handle_request(http_request_data * request)
 {
@@ -104,6 +113,13 @@ handle_request(http_request_data * request)
         return NULL;
 }
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: This is the code that the threads in the pool run.
+****************************************************************************/
 static
 #ifdef __unix__
 void *
@@ -231,7 +247,7 @@ thread_main(LPVOID thread_arg)
 }
 
 // BEGIN : public interface
-
+/**************************************************************************/
 void
 threadpool_init(void)
 {
@@ -250,6 +266,7 @@ threadpool_init(void)
     }
 }
 
+/**************************************************************************/
 void
 socket_has_been_queued(void)
 {

@@ -37,9 +37,18 @@ DEFAULT_MESSAGE_SIZE = 1024;
 static int
 listening_socket = 0;
 
+/***************************************************************************/
 int
 get_listening_socket() { return listening_socket; }
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Prints an error that happens when calling the socket API.
+    This is only for cross-platform execution.
+****************************************************************************/
 static void
 display_error(char * msg)
 {
@@ -50,6 +59,7 @@ display_error(char * msg)
 #endif
 }
 
+/***************************************************************************/
 void
 create_listening_socket(void)
 {
@@ -96,6 +106,7 @@ create_listening_socket(void)
     
 }
 
+/***************************************************************************/
 char *
 read_from_socket(int sockfd)
 {
@@ -116,6 +127,7 @@ read_from_socket(int sockfd)
     return message;
 }
 
+/***************************************************************************/
 void
 write_to_socket(int sockfd, char * message, int message_length)
 {
@@ -141,6 +153,7 @@ write_to_socket(int sockfd, char * message, int message_length)
     }
 }
 
+/***************************************************************************/
 void
 close_socket(int sockfd)
 {

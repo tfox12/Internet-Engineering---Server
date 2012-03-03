@@ -11,6 +11,7 @@ INSTRUCTOR: Javed Khan
 #include <string.h>
 #include <stdlib.h>
 
+/**************************************************************************/
 int
 uri_is_script(char * uri)
 {
@@ -28,6 +29,13 @@ typedef struct
     file_pointer pipe_write;
 } ipc_pipe;
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Returns the executable name that runs a specified script
+****************************************************************************/
 static char *
 script_id_to_script_name(int script_id)
 {
@@ -39,6 +47,13 @@ script_id_to_script_name(int script_id)
     }
 }
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Creates an anonymous pipe
+****************************************************************************/
 static int
 make_pipe(ipc_pipe * anonymous_pipe)
 {
@@ -81,6 +96,15 @@ make_pipe(ipc_pipe * anonymous_pipe)
 
 }
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Creates a new process for the script to run in. The new
+    process has its stdout set as the write end of the pipe. Parent waits
+    until the child is done. Returns the exit code of the child process.
+****************************************************************************/
 static int
 run_script(ipc_pipe anonymous_pipe, int script_id, char * script)
 {
@@ -150,6 +174,7 @@ run_script(ipc_pipe anonymous_pipe, int script_id, char * script)
     return 0;
 }
 
+/**************************************************************************/
 file_info *
 process_script(int script_id, char * script)
 {

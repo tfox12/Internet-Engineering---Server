@@ -10,6 +10,14 @@ INSTRUCTOR: Javed Khan
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Parses only the status line of a HTTP/1.1 request.
+****************************************************************************/
 static char * 
 parse_request_line(http_request_data * data, 
                    char * message_itor)
@@ -39,6 +47,13 @@ parse_request_line(http_request_data * data,
     return message_itor + 2;
 }
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: parses all of the headers of a standard HTTP/1.1 request.
+****************************************************************************/
 static char *
 parse_headers(http_request_data * data, 
                    char * message_itor)
@@ -90,6 +105,11 @@ parse_headers(http_request_data * data,
 http_request_data *
 parse_request(char * message)
 {
+    /* In order to parse the request, we just set pointers to the start
+       of various sections of the message, and replace separators with
+       null characters. this will split the one big string into smaller
+       strings, while not allocating any extra memory or doing any copy*/
+
     http_request_data * data;
     char * message_itor;
 

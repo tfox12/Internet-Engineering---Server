@@ -14,6 +14,7 @@ static queue_node
 *next_in_line    = NULL,
 *end_of_line     = NULL;
 
+/**************************************************************************/
 void
 enqueue_socket(int sockfd, struct sockaddr_in client)
 {
@@ -34,6 +35,7 @@ enqueue_socket(int sockfd, struct sockaddr_in client)
     socket_has_been_queued();
 }
 
+/**************************************************************************/
 queue_node*
 dequeue_socket(void)
 {

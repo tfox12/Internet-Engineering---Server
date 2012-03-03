@@ -13,6 +13,15 @@ INSTRUCTOR: Javed Khan
 #include "socketlayer.h"
 #include "config.h"
 
+/**************************************************************************** 
+FILE SPECIFIC SUB-ROUTINE
+
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Signal handler. This routine is called whenever the
+    process receives a SIGINT or SIGTERM. The handler cleans up the listening
+    socket and the config data before we close.
+****************************************************************************/
 static void
 safe_close(int signum)
 {
@@ -25,6 +34,7 @@ safe_close(int signum)
     exit(0);
 }
 
+/**************************************************************************/
 void
 set_handlers()
 {
