@@ -1,3 +1,8 @@
+#GROUP: We probably don't have a name
+#MEMBERS: Adam Davis, Tim Fox
+#CS 4/55231 INTERNETENGINEERING 2012 SPRING
+#INSTRUCTOR: Javed Khan
+
 import re
 import socket
 
@@ -45,7 +50,6 @@ url = raw_input("enter a url \n")
 connectionInfo = parse_url(url)
 
 
-hostIp = socket.gethostbyname(connectionInfo['host'])
 port = defaultPort
 
 splitHost = connectionInfo['host'].split('@')
@@ -61,6 +65,7 @@ if len(splitHost) > 1:
 
 host = connectionInfo['host']
 
+hostIp = socket.gethostbyname(connectionInfo['host'])
 print ":::Connection Information:::\n\
 	Host: %s (IP: %s) \n\
 	Target: %s\n\
@@ -98,11 +103,15 @@ for url in imgUrls:
 	httpGetRequest = 'GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP Client\r\n\r\n' % (connectionInfo['target'])
 
 	bytesSent = connectionSocket.send(httpGetRequest)
-	data = connectionSocket.recv(1024)
 	newFile = open(connectionInfo['fileName'], 'w')
-	info =''
-	while data != '':
-		info += data
-		data = connectionSocket.recv(1024)
-	newFile.write(info)		
+	
+	while True:
+		print connectionInfo['host'] + connectionInfo['target'] + "\n"
+		data = connectionSocket.recv(512)
+		if not data:
+			break
+		print data
+		newFile.write(data)
+		
+	newFile.close()		
 
