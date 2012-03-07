@@ -6,6 +6,9 @@
 import re
 import socket
 
+
+#Function for parsing URL - gets host, protocol if specified 
+#and targetFile for HTTP request
 def parse_url(url):
 	filename =''
 	target = ''
@@ -86,6 +89,10 @@ html = ''
 while data != '':
 	html += data
 	data = connectionSocket.recv(1024)
+#saving copy of file....
+newFile = open(connectionInfo['fileName'], 'w')
+newFile.write(html)
+newFile.close()
 
 #Searching out target file for img tags...
 imgUrls = re.findall('img.*?src="(.*?)"', html)
@@ -104,14 +111,10 @@ for url in imgUrls:
 
 	bytesSent = connectionSocket.send(httpGetRequest)
 	newFile = open(connectionInfo['fileName'], 'w')
-	
 	while True:
-		print connectionInfo['host'] + connectionInfo['target'] + "\n"
 		data = connectionSocket.recv(512)
 		if not data:
 			break
-		print data
 		newFile.write(data)
-		
 	newFile.close()		
 
