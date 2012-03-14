@@ -272,7 +272,11 @@ threadpool_destroy(void)
     int idx;
     for(idx = 0; idx < NUM_THREADS; ++idx)
     {
+#ifdef __unix__
         pthread_kill(pool[idx],9);
+#else
+        TerminateThread(pool[idx],0);
+#endif
     }
 }
 

@@ -137,9 +137,10 @@ handle_get(http_request_data * data)
                             match_extention_to_MIME(strchr(data->uri,'.')+1));
 
         response->body   = resource_data->data;
+        free(resource_data);
     }
     free(resource_location); 
-    free(resource_data);
+    
     
     return response;
 }

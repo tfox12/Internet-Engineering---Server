@@ -55,7 +55,7 @@ free_response_data(http_response_data * data)
     data->headers_values = temp;
   }
 
-  free(data->body);
+  if(*data->body) free(data->body);
 
   /* delete dat struct   */
   free(data);
