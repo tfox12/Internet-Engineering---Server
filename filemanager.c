@@ -72,7 +72,7 @@ get_file_contents(file_pointer file)
         {
             cpy_buffer[buffer_offset] = buffer[buffer_offset];
         }
-        for(temp_offset = 0; buffer_size - buffer_offset >= 0; ++buffer_offset, ++temp_offset)
+        for(temp_offset = 0; buffer_size - buffer_offset > 0; ++buffer_offset, ++temp_offset)
         {
             cpy_buffer[buffer_offset] = temp_buffer[temp_offset];
         }

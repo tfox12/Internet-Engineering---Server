@@ -35,7 +35,7 @@ log_message(char * ip_address,
                                         strlen(document_name) +
                                         strlen(server_status) +
 #ifdef _WIN32
-                                        8, sizeof(char));
+                                        9, sizeof(char));
 
     sprintf(message,"%s (%s) %s %s %s\r\n",  ip_address,
                                          time_stamp,
@@ -44,7 +44,7 @@ log_message(char * ip_address,
                                          server_status);
     WriteFile((HANDLE)get_log_pointer(),message,strlen(message),&bytes_written,NULL);
 #elif defined __unix__
-                                        7, sizeof(char));
+                                        8, sizeof(char));
 
     sprintf(message,"%s (%s) %s %s %s\n",  ip_address,
                                          time_stamp,
@@ -59,5 +59,7 @@ log_message(char * ip_address,
     
 #endif
     
+    free(message);
+
     return 0;
 }

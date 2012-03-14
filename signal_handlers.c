@@ -31,6 +31,8 @@ safe_close(int signum)
     // clean up the config
     unload_configuration();
 
+    threadpool_destroy();
+
     exit(0);
 }
 

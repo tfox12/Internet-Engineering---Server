@@ -39,14 +39,23 @@ free_response_data(http_response_data * data)
 {
   /* clear header keys.... NOPE, 
      no keys should be allocated to the heap */
+  while(data->headers_keys)
+  {
+    char_node * temp     = data->headers_keys->next;
+    free(data->headers_keys);
+    data->headers_keys = temp;
+  }
 
   /* clear header values */
   while(data->headers_values)
   {
     char_node * temp     = data->headers_values->next;
+    free(data->headers_values->val);
     free(data->headers_values);
     data->headers_values = temp;
   }
+
+  free(data->body);
 
   /* delete dat struct   */
   free(data);

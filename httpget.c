@@ -91,16 +91,19 @@ handle_get(http_request_data * data)
     char                * resource_location;
     file_pointer          resource;
     file_info           * resource_data;
-    int                   script_id;
+    int                   script_id,
+                          resource_length;
     
     response = (http_response_data *) malloc(
                sizeof(http_response_data));
     memset(response,0,sizeof(http_response_data));
     response->version = HTTP_VERSION;
 
-    resource_location = (char *) calloc(
+    resource_length = 
                strlen(get_document_root()) + 
-               strlen(data->uri),
+               strlen(data->uri) + 1;
+    resource_location = (char *) calloc(
+               resource_length,
                sizeof(char));
     strcpy(resource_location,get_document_root());
     strcat(resource_location,data->uri);
@@ -135,6 +138,8 @@ handle_get(http_request_data * data)
 
         response->body   = resource_data->data;
     }
-
+    free(resource_location); 
+    free(resource_data);
+    
     return response;
 }

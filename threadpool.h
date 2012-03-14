@@ -21,6 +21,14 @@ threadpool_init(void);
 /**************************************************************************** 
 GROUP NAME: 
 MODULE DEVELOPER: Tim Fox
+MODULE DESCRIPTION: Releases the thread data created when the program starts. 
+****************************************************************************/
+void
+threadpool_destroy(void);
+
+/**************************************************************************** 
+GROUP NAME: 
+MODULE DEVELOPER: Tim Fox
 MODULE DESCRIPTION: Will wake up a sleeping thread to handle a new socket put
     onto the socketqueue.
 ****************************************************************************/

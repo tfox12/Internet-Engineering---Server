@@ -265,6 +265,17 @@ threadpool_init(void)
 }
 
 /**************************************************************************/
+
+void
+threadpool_destroy(void)
+{
+    int idx;
+    for(idx = 0; idx < NUM_THREADS; ++idx)
+    {
+        pthread_kill(pool[idx],9);
+    }
+}
+
 void
 socket_has_been_queued(void)
 {
