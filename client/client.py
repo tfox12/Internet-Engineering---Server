@@ -5,10 +5,27 @@
 
 import re
 import socket
+from threadpool import *
 
 
-#Function for parsing URL - gets host, protocol if specified 
-#and targetFile for HTTP request
+
+def HttpGet(connectionInfo):
+    connectionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connectionSocket.connect((connectionInfo['host'], 80))
+    print 'yup'
+    httpGetRequest = 'GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP Client\r\n\r\n' % (connectionInfo['target'])
+
+    bytesSent = connectionSocket.send(httpGetRequest)
+    newFile = open(connectionInfo['fileName'], 'w')
+
+    while True:
+        data = connectionSocket.recv(512)
+        if not data:
+            break
+        newFile.write(data)
+    newFile.close() 
+	
+	
 def parse_url(url):
 	filename =''
 	target = ''
@@ -46,7 +63,7 @@ fileName = ''
 defaultPort = 80
 port = 0
 
-
+threadPool = ThreadPool(20)
 connectionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 url = raw_input("enter a url \n")
@@ -97,24 +114,17 @@ newFile.close()
 #Searching out target file for img tags...
 imgUrls = re.findall('img.*?src="(.*?)"', html)
 
+connectionSocket.close()
+
 for url in imgUrls:
 	connectionInfo = parse_url(url)
 	if connectionInfo['host'] is "":
 		connectionInfo['host'] = host
 
 	#new socket for retrieving img srcs
-	connectionSocket.close()
-	connectionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	connectionSocket.connect((connectionInfo['host'], 80))
 
-	httpGetRequest = 'GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP Client\r\n\r\n' % (connectionInfo['target'])
 
-	bytesSent = connectionSocket.send(httpGetRequest)
-	newFile = open(connectionInfo['fileName'], 'w')
-	while True:
-		data = connectionSocket.recv(512)
-		if not data:
-			break
-		newFile.write(data)
-	newFile.close()		
+	HttpGet(connectionInfo)
+	
+threadPool.wait_for_finish()
 
