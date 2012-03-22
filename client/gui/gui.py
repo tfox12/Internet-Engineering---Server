@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'web_client.ui'
 #
-# Created: Thu Mar 22 17:31:52 2012
+# Created: Thu Mar 22 18:01:26 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,12 +24,12 @@ class Ui_MainWindow(object):
         self.textEdit.setGeometry(QtCore.QRect(40, 10, 701, 21))
         self.textEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
-        self.pushButton = QtGui.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(740, 10, 21, 21))
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.pushButton_2 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(770, 10, 16, 21))
-        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
+        self.loadUrlButton = QtGui.QPushButton(self.centralwidget)
+        self.loadUrlButton.setGeometry(QtCore.QRect(740, 10, 21, 21))
+        self.loadUrlButton.setObjectName(_fromUtf8("loadUrlButton"))
+        self.cancelLoadButton = QtGui.QPushButton(self.centralwidget)
+        self.cancelLoadButton.setGeometry(QtCore.QRect(770, 10, 16, 21))
+        self.cancelLoadButton.setObjectName(_fromUtf8("cancelLoadButton"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 18))
@@ -53,8 +53,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "MainWindow", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton.setText(QtGui.QApplication.translate("MainWindow", "PushButton", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_2.setText(QtGui.QApplication.translate("MainWindow", "PushButton", None, QtGui.QApplication.UnicodeUTF8))
+        self.loadUrlButton.setText(QtGui.QApplication.translate("MainWindow", "PushButton", None, QtGui.QApplication.UnicodeUTF8))
+        self.cancelLoadButton.setText(QtGui.QApplication.translate("MainWindow", "PushButton", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.menuWorthwhile.setTitle(QtGui.QApplication.translate("MainWindow", "Worthwhile", None, QtGui.QApplication.UnicodeUTF8))
         self.menuMenus.setTitle(QtGui.QApplication.translate("MainWindow", "Menus", None, QtGui.QApplication.UnicodeUTF8))
