@@ -124,7 +124,7 @@ for url in imgUrls:
 	#new socket for retrieving img srcs
 
 
-	HttpGet(connectionInfo)
+	threadPool.add_task(HttpGet, connectionInfo)
 	
 threadPool.wait_for_finish()
 
