@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'web_client.ui'
 #
-# Created: Thu Mar 22 18:32:30 2012
+# Created: Thu Mar 22 18:53:24 2012
 #      by: PyQt4 UI code generator 4.9.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,6 +30,10 @@ class Ui_MainWindow(object):
         self.cancelLoadButton = QtGui.QPushButton(self.centralwidget)
         self.cancelLoadButton.setGeometry(QtCore.QRect(770, 10, 16, 21))
         self.cancelLoadButton.setObjectName(_fromUtf8("cancelLoadButton"))
+        self.webView = QtWebKit.QWebView(self.centralwidget)
+        self.webView.setGeometry(QtCore.QRect(30, 40, 751, 541))
+        self.webView.setUrl(QtCore.QUrl(_fromUtf8("about:blank")))
+        self.webView.setObjectName(_fromUtf8("webView"))
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 18))
@@ -59,3 +63,4 @@ class Ui_MainWindow(object):
         self.menuWorthwhile.setTitle(QtGui.QApplication.translate("MainWindow", "Worthwhile", None, QtGui.QApplication.UnicodeUTF8))
         self.menuMenus.setTitle(QtGui.QApplication.translate("MainWindow", "Menus", None, QtGui.QApplication.UnicodeUTF8))
 
+from PyQt4 import QtWebKit
