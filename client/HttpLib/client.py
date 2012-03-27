@@ -2,60 +2,16 @@
 #MEMBERS: Adam Davis, Tim Fox
 #CS 4/55231 INTERNETENGINEERING 2012 SPRING
 #INSTRUCTOR: Javed Khan
-
+from UrlTools import parse_url
 import re
 import socket
 from threads.threadpool import *
-
-class HttpResponse:
-    def __init__(self, contents):
-        self.contents = contents
+from HttpLib import HttpGet
         
-def HttpGet(connectionInfo):
-    connectionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connectionSocket.connect((connectionInfo['host'], 80))
-    print 'yup'
-    httpGetRequest = 'GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP Client\r\n\r\n' % (connectionInfo['target'])
 
-    bytesSent = connectionSocket.send(httpGetRequest)
-    newFile = open(connectionInfo['fileName'], 'w')
-
-    while True:
-        data = connectionSocket.recv(512)
-        if not data:
-            break
-        newFile.write(data)
-    newFile.close() 
 	
 	
-def parse_url(url):
-	filename =''
-	target = ''
-	protocol = 'http'
-	if len(url.split('://')) > 1:
-		url =  url.split('://')
-		protocol =  url[0]
-		url = url[1]
 
-
-	if url.split('/'):
-		url = url.split('/')
-		if len(url) > 1:
-			host = url[0]
-			index = 1
-			while index < len(url):
-				target += '/'+ url[index]
-		
-				if index == (len(url) -1):
-					fileName = url[index]
-
-				index = index + 1
-		else:
-			host = url[0]
-			target = '/'
-			fileName = 'index.html'
-	connectionInfo = {'host' : host, 'target' : target, 'fileName' : fileName, 'protocol' : protocol}
-	return connectionInfo
 
 target = ''
 host = ''
@@ -67,17 +23,11 @@ port = 0
 
 def fetchPage(url):
     threadPool = ThreadPool(20)
-    connectionSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
     connectionInfo = parse_url(url)
     
     
     port = defaultPort
-    
     splitHost = connectionInfo['host'].split('@')
-    if len(splitHost) > 1:
-    	print splitHost
-    
     splitHost = connectionInfo['host'].split(':')
     
     if len(splitHost) > 1:
@@ -85,7 +35,7 @@ def fetchPage(url):
     	port = int(splitHost[1])
     
     
-    host = connectionInfo['host']
+
     
     hostIp = socket.gethostbyname(connectionInfo['host'])
     print ":::Connection Information:::\n\
@@ -93,32 +43,20 @@ def fetchPage(url):
     	Target: %s\n\
     	Port:	%s\n\
     	Protocol: %s\n" % ( connectionInfo['host'],hostIp, connectionInfo['target'], port, connectionInfo['protocol'])
-    	  
-    #build HTTP GET request
-    httpGetRequest = 'GET %s HTTP/1.0\r\nHost: www.lol.biz\r\nUser-Agent: My HTTP Client\r\n\r\n' % (connectionInfo['target'])
-    print ":::Message Sent:::\n %s" % (httpGetRequest)
+        
+    httpGet = HttpGet(connectionInfo)
+    print ":::Message Sent:::\n %s" % (httpGet.requestText)
     
     #connecting to targetHost and recieving file
-    connectionSocket.connect((connectionInfo['host'], port))
-    bytesSent = connectionSocket.send(httpGetRequest)
-    
-    data = ''
-    data = connectionSocket.recv(1024)
-    html = ''
-    while data != '':
-    	html += data
-    	data = connectionSocket.recv(1024)
-    #saving copy of file....
-    newFile = open(connectionInfo['fileName'], 'w')
-    newFile.write(html)
-    newFile.close()
-    htmlFileName = connectionInfo['fileName']
-    ourResponse = HttpResponse(html)
+    try:
+        httpResponse = httpGet.sendRequest()
+    except Exception, e:
+        print e.msg
     
     #Searching out target file for img tags...
-    imgUrls = re.findall('img.*?src="(.*?)"', html)
+    imgUrls = re.findall('img.*?src="(.*?)"', httpResponse.contents)
     
-    connectionSocket.close()
+
     
     for url in imgUrls:
     	connectionInfo = parse_url(url)
@@ -128,8 +66,9 @@ def fetchPage(url):
     	#new socket for retrieving img srcs
     
     
-    	threadPool.add_task(HttpGet, connectionInfo)
+    	threadPool.add_task(HttpGet(connectionInfo).sendRequest(), )
     	
     threadPool.wait_for_finish()
-    return ourResponse
+
+    return httpResponse.contents
 
