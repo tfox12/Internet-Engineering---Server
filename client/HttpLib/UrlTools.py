@@ -11,6 +11,7 @@ def parse_url(url):
     if url.split('/'):
         url = url.split('/')
         if len(url) > 1:
+            
             host = url[0]
             index = 1
             while index < len(url):

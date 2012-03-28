@@ -6,8 +6,8 @@ from UrlTools import parse_url
 import re
 import socket
 from threads.threadpool import *
-from HttpLib import HttpGet
-        
+from HttpLib.HttpRequest import HttpGet, HttpPost
+from HttpLib.HttpResponse import *
 
 	
 	
@@ -49,13 +49,14 @@ def fetchPage(url):
     
     #connecting to targetHost and recieving file
     try:
-        httpResponse = httpGet.sendRequest()
+        httpResponse = HttpResponse(httpGet.sendRequest())
     except Exception, e:
-        print e.msg
+        print e.message
     
     #Searching out target file for img tags...
-    imgUrls = re.findall('img.*?src="(.*?)"', httpResponse.contents)
-    
+    imgUrls = re.findall('img.*?src="(.*?)"', httpResponse.serverResponse)
+    if len(imgUrls) == 0:
+        imgUrls = re.findall('IMG.*?SRC="(.*?)"', httpResponse.serverResponse)
 
     
     for url in imgUrls:
@@ -63,12 +64,9 @@ def fetchPage(url):
     	if connectionInfo['host'] is "":
     		connectionInfo['host'] = host
     
-    	#new socket for retrieving img srcs
-    
-    
     	threadPool.add_task(HttpGet(connectionInfo).sendRequest(), )
     	
     threadPool.wait_for_finish()
 
-    return httpResponse.contents
+    return httpResponse.serverResponse
 
