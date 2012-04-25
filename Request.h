@@ -1,5 +1,5 @@
-#ifndef _SERVER_HTTPREQUEST_
-#define _SERVER_HTTPREQUEST_
+#ifndef _SERVER_REQUEST_
+#define _SERVER_REQUEST_
 
 #include <string>
 #include <vector>
@@ -7,19 +7,21 @@
 
 namespace Server
 {
-    class HttpRequest
+    class Request
     {
 
     public:
 
-        static enum RequestType
+        enum RequestMethod
         {
             GET, POST, NONE
         };
 
-        RequestType type();
+        RequestMethod type();
 
-        HttpRequest(std::string);
+        int cookie;
+
+        Request(std::string);
 
         // request line
         std::string method;

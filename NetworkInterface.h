@@ -5,20 +5,10 @@
 #include <cerrno>
 #include <exception>
 
-/*unix headers*/
-#ifdef __unix__
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-/*windows headers*/
-#elif defined _WIN32
-#include <WinSock2.h> // fun fact, this must be included before windows
-#include <Windows.h>
-
-#pragma comment(lib, "Ws2_32.lib")
-
-#endif
 
 namespace Server
 {
@@ -32,10 +22,14 @@ namespace Server
         ~Socket();
 
         Socket(int,bool);
+        
+        bool is_valid();
 
         std::string recv_all(void) const;
 
         void send_all(const std::string&) const;
+        
+        bool stream(char *);
 
         Socket * accept_connection();
 

@@ -4,49 +4,42 @@
 #include <fstream>
 #include <sstream>
 
-#ifdef _WIN32
-
-#include <Windows.h>
-
-#else
-
 #include <unistd.h>
-
-#endif
 
 namespace Server
 {
-    Script::Script(std::string str) : mPath(str)
+    Script::Script(std::string str, std::string input) : mPath(str), mInput(input)
     {
 
     }
 
 
 
-    Script * Script::buildScript(std::string uri)
+    Script * Script::buildScript(std::string uri, std::string input)
     {
         std::string extension = uri.substr(uri.find_last_of('.')+1);
         if(extension == "py")
-            return new PythonScript(uri);
+            return new PythonScript(uri,input);
         return 0;
     }
 
     anonymous_pipe Script::make_a_pipe()
     {
 
-        anonymous_pipe pipe = {0};
+        anonymous_pipe thePipe = {0};
+        
+        int fds[2];
+        if(pipe(fds) == -1)
+        {
+            perror("MAKE A PIPE | PIPE");
+            pthread_exit(NULL);
+        }
 
-#ifdef _WIN32
+        thePipe.pipe_read  = fds[0];
+        thePipe.pipe_write = fds[1];
 
-        windows_make_a_pipe(pipe);
 
-#else
-
-        unix_make_a_pipe(anonymous_pipe& pipe)
-
-#endif
-
-        return pipe;
+        return thePipe;
     }
 
 
@@ -54,120 +47,68 @@ namespace Server
     std::string Script::execute()
     {
         anonymous_pipe output_pipe = make_a_pipe();
-
-#ifdef _WIN32
-
-        windows_execute(output_pipe);
-
-        return windows_read_pipe(output_pipe);
-
-#elif defined __unix__
+        anonymous_pipe input_pipe = make_a_pipe();
         
-        unix_execute(output_pipe);
         
-#endif
         
-    }
-
-#ifdef _WIN32
-
-    void Script::windows_make_a_pipe(anonymous_pipe& pipe)
-    {
-        SECURITY_ATTRIBUTES attributes;
- 
-        attributes.nLength = sizeof(SECURITY_ATTRIBUTES); 
-        attributes.bInheritHandle = TRUE; 
-        attributes.lpSecurityDescriptor = NULL;
-
-        if(!
-        CreatePipe((PHANDLE)(&(pipe.pipe_read )),
-                   (PHANDLE)(&(pipe.pipe_write)),
-                   &attributes, 0 ))
-        {
-            printf("were not making a pipe today, boy\n");
-        }
-    }
-
-    void Script::windows_execute(anonymous_pipe& output_pipe)
-    {
-        STARTUPINFO         startup_info = {0};
-        PROCESS_INFORMATION process_info = {0};
-        std::stringstream commandline(std::stringstream::in | std::stringstream::out);
-    
-        startup_info.cb         = sizeof(startup_info);
-        startup_info.hStdOutput = (HANDLE) output_pipe.pipe_write;
-        startup_info.dwFlags = STARTF_USESTDHANDLES;
-
-        commandline << this->script_process() << " " << mPath;
-
-        std::string str = commandline.str();
-        const char * cmdline = str.c_str();
-
-        if(!CreateProcess(NULL,(LPSTR)cmdline,NULL,NULL,TRUE,0,NULL,NULL,&startup_info,&process_info))
-        {
-            printf("we did not make that process, fuck!\n");
-            return;
-        }
+        const char * process = this->script_process().c_str();
+        const char * file = mPath.c_str();
         
-        WaitForSingleObject(process_info.hProcess,INFINITE);
-
-        CloseHandle(process_info.hProcess);
-        CloseHandle(process_info.hThread);
-    }
-
-    std::string Script::windows_read_pipe(anonymous_pipe& pipe)
-    {
-        std::string data = "";
-        char buffer[BUFSIZ];
-        DWORD bytesread = 0;
-
-        do
+        int pid = fork();
+        
+        if(pid == -1)
         {
-
-            ReadFile((HANDLE)pipe.pipe_read,buffer,BUFSIZ,&bytesread,NULL);
-            data.append(buffer,bytesread);
-
+        
+            perror("we didnt fork!!!");
+            
         }
-        while(bytesread == BUFSIZ);
-
-        return data;
-    }
-
-#else
-
-    void Script::unix_make_a_pipe(anonymous_pipe& pipe)
-    {
-        file_pointer duplex[2];    
-
-        if(pipe(duplex) < 0)
+        else if(pid == 0)
         {
-            return;
-        }
-
-        pipe.pipe_write = duplex[1];
-        pipe.pipe_read  = duplex[0];
-    }
-
-    void Script::unix_execute(anonymous_pipe& output_pipe)
-    {
-        int return_status;
-
-        if(fork() == 0) // child process
-        {
+        
             dup2(output_pipe.pipe_write,STDOUT_FILENO);
-            close(anonymous_pipe.pipe_read );
-            execlp(script_id_to_script_name(script_id),
-                   script_id_to_script_name(script_id),
-                   script,NULL);       
+            dup2(input_pipe.pipe_read,STDIN_FILENO);
+            
+            close(output_pipe.pipe_read);
+            close(input_pipe.pipe_write);
+        
+            execl(process, process, file, NULL);
+            
         }
         else
         {
-            close(anonymous_pipe.pipe_write);
-            wait(&return_status); 
+        
+            close(output_pipe.pipe_write);
+            close(input_pipe.pipe_read);
+            
+            const char * const input_data = mInput.c_str();
+            int byteswritten = 0;
+            int wrote = 0;
+            while((wrote = (int) write(input_pipe.pipe_write,input_data + byteswritten, mInput.length() - byteswritten)))
+            {
+                byteswritten += wrote;
+            }
+            
+            close(input_pipe.pipe_write);
+            
+            std::cout << "wrote to pipe: " << byteswritten << " bytes" << std::endl;
+            
+            int returnstatus;
+            wait(&returnstatus);
+            
         }
+        
+        char buff[BUFSIZ];
+        std::string data;
+        int bytesread = 0;
+        while((bytesread = (int) read(output_pipe.pipe_read,buff,BUFSIZ)) != 0)
+        {
+            data.append(buff,bytesread);
+        }
+        
+        close(output_pipe.pipe_read);
+        
+        return data;
     }
-
-#endif
 
     bool Script::is_uri_a_script(std::string uri)
     {

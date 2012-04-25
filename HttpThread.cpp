@@ -1,8 +1,9 @@
 #include "HttpThread.h"
 #include "HttpGetThread.h"
 #include "HttpPostThread.h"
-#include "HttpRequest.h"
+#include "Request.h"
 #include <string>
+#include <iostream>
 
 
 namespace Server
@@ -14,13 +15,15 @@ namespace Server
 
     void HttpThread::run()
     {
+        std::cout << "Processing a new message" << std::endl;
+        
         std::string data = mSocket->recv_all();
 
         if(data == "") return;
 
-        HttpRequest request(data);
-        HttpResponse response;
-
+        Request request(data);
+        Response response;
+        
         if(validate_uri(request.uri))
         {
 
@@ -29,17 +32,17 @@ namespace Server
             switch(request.type())
             {
 
-            case HttpRequest::RequestType::GET:
+            case Request::GET:
                 worker = new HttpGetThread(request,response);
                 break;
 
-            case HttpRequest::RequestType::POST:
+            case Request::POST:
                 worker = new HttpPostThread(request,response);
                 break;
 
-            case HttpRequest::RequestType::NONE:
+            case Request::NONE:
             default:
-                response.code = HttpResponse::METHOD_NOT_ALLOWED;
+                response.code = Response::METHOD_NOT_ALLOWED;
                 response.add_header("Content-Length","0");
                 break;
             }
@@ -52,7 +55,7 @@ namespace Server
         else
         {
 
-            response.code = HttpResponse::NOT_FOUND;
+            response.code = Response::NOT_FOUND;
             response.add_header("Content-Length","0");
 
         }
@@ -64,18 +67,7 @@ namespace Server
     bool HttpThread::validate_uri(std::string uri)
     {
 
-#ifdef _WIN32
-
-        DWORD dwAttrib = GetFileAttributes(uri.c_str());
-
-        return (dwAttrib != INVALID_FILE_ATTRIBUTES && 
-               !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
-
-#else
-
-
-
-#endif
+        return true;
 
     }
 }

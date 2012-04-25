@@ -14,8 +14,12 @@ namespace Server
         for(;;)
         {
             Server::Socket * connection = Server::NetworkInterface::instance()->accept_new_connection();
-            Thread * worker = new Server::HttpThread(connection);
-            worker->start();
+            ;
+            if(connection->is_valid())
+            {
+                Thread * worker = new Server::HttpThread(connection);
+                worker->start();
+            }
         }
     }
 }

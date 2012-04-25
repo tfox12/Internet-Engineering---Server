@@ -2,8 +2,8 @@
 #define _SERVER_THREADS_HTTPGETTHREAD_
 
 #include "Thread.h"
-#include "HttpRequest.h"
-#include "HttpResponse.h"
+#include "Request.h"
+#include "Response.h"
 
 namespace Server
 {
@@ -12,15 +12,15 @@ namespace Server
 
     public:
 
-        HttpGetThread(HttpRequest,HttpResponse&);
+        HttpGetThread(Request,Response&);
 
         virtual void run();
 
     private:
         void file_not_found();
 
-        HttpRequest mRequest;
-        HttpResponse& mResponse;
+        Request mRequest;
+        Response& mResponse;
     };
 }
 

@@ -2,8 +2,8 @@
 #define _SERVER_HTTPPOSTTHREAD_
 
 #include "Thread.h"
-#include "HttpRequest.h"
-#include "HttpResponse.h"
+#include "Request.h"
+#include "Response.h"
 
 namespace Server
 {
@@ -11,13 +11,13 @@ namespace Server
     {
     public:
 
-        HttpPostThread(HttpRequest,HttpResponse&);
+        HttpPostThread(Request,Response&);
 
         virtual void run();
     
     private:
-        HttpRequest mRequest;
-        HttpResponse &mResponse;
+        Request mRequest;
+        Response &mResponse;
     };
 }
 

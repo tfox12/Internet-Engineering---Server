@@ -10,9 +10,9 @@ namespace Server
     {
     public:
 
-        PythonScript(std::string str) : Script(str) { }
+        PythonScript(std::string str,std::string input) : Script(str,input) { }
 
-        virtual std::string script_process() { return "python"; }
+        virtual std::string script_process() { return "/usr/bin/python"; }
     };
 }
 

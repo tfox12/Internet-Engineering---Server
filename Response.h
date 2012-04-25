@@ -1,5 +1,5 @@
-#ifndef _SERVER_HTTPRESPONSE_
-#define _SERVER_HTTPRESPONSE_
+#ifndef _SERVER_RESPONSE_
+#define _SERVER_RESPONSE_
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 
 namespace Server
 {
-    class HttpResponse
+    class Response
     {
 
     public:
@@ -18,7 +18,7 @@ namespace Server
         static std::pair<std::string,std::string> METHOD_NOT_ALLOWED;
         static std::pair<std::string,std::string> LENGTH_REQUIRED;
 
-        HttpResponse() : version("1.1"), body("") {}
+        Response() : version("HTTP/1.1"), body("") {}
 
         std::string version;
         std::pair<std::string,std::string> code;

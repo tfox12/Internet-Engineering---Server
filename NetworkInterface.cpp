@@ -8,18 +8,8 @@ namespace Server
     static void
     close_socket(int sockfd)
     {
-
-#ifdef _WIN32
-
-        shutdown(sockfd,SD_BOTH);
-        closesocket(sockfd);
-
-#else
-
         shutdown(sockfd,SHUT_RDWR);
         close(sockfd);
-
-#endif
 
     }
 
@@ -39,11 +29,13 @@ namespace Server
     {
         
     }
+    
+    bool Socket::is_valid() { return mSocketDescriptor != -1; }
 
     std::string Socket::recv_all(void) const
     {
         if(mSocketDescriptor == -1)
-            throw std::exception("Recv Error: invalid socket");
+            throw std::exception();
 
         char buffer[BUFSIZ] = {0};
         int bytesread = 0;
@@ -51,7 +43,7 @@ namespace Server
 
         do
         {
-            bytesread = recv(mSocketDescriptor,buffer,BUFSIZ,0);
+            bytesread = (int) recv(mSocketDescriptor,buffer,BUFSIZ,0);
             data.append(buffer,bytesread);
         }while( bytesread == BUFSIZ );
 
@@ -61,16 +53,18 @@ namespace Server
     void Socket::send_all(const std::string& data) const
     {
         if(mSocketDescriptor == -1)
-            throw std::exception("Send Error: invalid socket");
+        {
+            throw std::exception();
+        }
 
         const char * buffer = data.data();
-        int bytestosend = data.length();
-        int transmission_unit = bytestosend;
+        long bytestosend = data.length();
+        long transmission_unit = bytestosend;
 
         // assume we can send the max size, then binary search for the MTU
         while(bytestosend)
         {
-            while(send(mSocketDescriptor,buffer,transmission_unit,0) == -1 &&
+            while(::send(mSocketDescriptor,buffer,transmission_unit,0) == -1 &&
                   errno == EMSGSIZE)
             {
                 bytestosend = (bytestosend / 2) + 1; // we need round up, assume we rounded down
@@ -79,6 +73,14 @@ namespace Server
             bytestosend -= transmission_unit;
             buffer += transmission_unit;
         }
+    }
+    
+    bool Socket::stream(char *buff)
+    {
+        int returnval = (int) ::send(mSocketDescriptor,buff,BUFSIZ,0);
+        if(returnval == -1) return false;
+        delete buff;
+        return true;
     }
 
     Socket * Socket::accept_connection()
@@ -96,20 +98,8 @@ namespace Server
     NetworkInterface::NetworkInterface()
     {
 
-#ifdef _WIN32
-
-        WSADATA data;
-
-#endif
-
         int sockfd;
         struct sockaddr_in addr;
-
-#ifdef _WIN32
-
-        WSAStartup(MAKEWORD(2,2),&data);
-
-#endif
 
         if((
         sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
@@ -121,7 +111,8 @@ namespace Server
         memset(&addr,0,sizeof(addr));
 
         addr.sin_family         = AF_INET;
-        addr.sin_port           = htons(Configuration::instance()->port());
+        int i = Configuration::instance()->port();
+        addr.sin_port           = htons(i);
         addr.sin_addr.s_addr    = INADDR_ANY;
 
         if(
