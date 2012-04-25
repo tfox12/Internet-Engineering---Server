@@ -24,9 +24,12 @@ namespace Server
             querystring = mRequest.uri.substr(pos+1);
         }
         else pos = (int) mRequest.uri.length();
-        if(Script::is_uri_a_script(mRequest.uri))
+        
+        std::string uri = mRequest.uri.substr(0,pos);
+        
+        if(Script::is_uri_a_script(uri))
         {
-            Script * script = Script::buildScript(mRequest.uri.substr(0,pos),querystring);
+            Script * script = Script::buildScript(uri,querystring);
             mResponse.body = script->execute();
         }
         else
