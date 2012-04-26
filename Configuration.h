@@ -17,6 +17,8 @@ namespace Server
         std::ofstream& log() { return mLog; }
         std::string document_root() { return mDocumentRoot; }
         int port() { return mPort; }
+        void setVerbose() {mVerbose = true;}
+        bool verbose() { return mVerbose;}
 
     private:
 
@@ -27,6 +29,7 @@ namespace Server
         std::ofstream mLog;
         std::string  mDocumentRoot;
         int mPort;
+        bool mVerbose;
     };
 }
 

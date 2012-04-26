@@ -28,6 +28,8 @@ namespace Server
         void add_header(std::string,std::string);
 
         std::string compile();
+        
+        void print();
     };
 }
 

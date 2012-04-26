@@ -1,6 +1,7 @@
 #include "HttpThread.h"
 #include "HttpGetThread.h"
 #include "HttpPostThread.h"
+#include "Configuration.h"
 #include "Request.h"
 #include <string>
 #include <iostream>
@@ -62,6 +63,12 @@ namespace Server
 
         std::string message = response.compile();
         mSocket->send_all(message);
+        
+        if(Configuration::instance()->verbose())
+        {
+          request.print();
+          response.print();
+        }
     }
 
     bool HttpThread::validate_uri(std::string uri)

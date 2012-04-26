@@ -1,4 +1,5 @@
 #include "Response.h"
+#include <iostream>
 #include <sstream>
 
 namespace Server
@@ -31,5 +32,19 @@ namespace Server
         ss << "\r\n" << body;
 
         return ss.str();
+    }
+    
+    void Response::print()
+    {
+      std::cout << "NEW RESPONSE:" << std::endl;
+    
+      std::cout << version << " " << code.first << " " << code.second << std::endl;
+      for(std::vector<std::pair<std::string, std::string> >::iterator itor = headers.begin();
+          itor < headers.end(); ++itor)
+      {
+          std::cout << itor->first << ": " << itor->second << std::endl;
+      }
+      
+      std::cout << body << std::endl;
     }
 }

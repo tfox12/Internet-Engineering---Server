@@ -33,6 +33,8 @@ namespace Server
        
         // payload
         std::string body;
+        
+        void print();
 
     };
 }

@@ -6,7 +6,7 @@ namespace Server
 
     static const char * CONFIG_FILE_NAME = "/Users/tim/Internet-Engineering---Server/server.config";
 
-    Configuration::Configuration()
+    Configuration::Configuration() : mVerbose(false)
     {
         std::ifstream config;
         config.open(CONFIG_FILE_NAME);

@@ -36,4 +36,18 @@ namespace Server
         else if (method == "POST") return POST;
         else return NONE;
     }
+    
+    void Request::print()
+    {
+      std::cout << "NEW REQUEST:" << std::endl;
+    
+      std::cout << method << " " << uri << " " << version << std::endl;
+      for(std::vector<std::pair<std::string, std::string> >::iterator itor = headers.begin();
+          itor < headers.end(); ++itor)
+      {
+          std::cout << itor->first << ": " << itor->second << std::endl;
+      }
+      
+      std::cout << body << std::endl;
+    }
 }
